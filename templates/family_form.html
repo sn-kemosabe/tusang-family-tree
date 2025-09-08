@@ -1,0 +1,908 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-plus"></i> <span data-translate="add-family-member-title">Add Family Member Information</span>
+                </h4>
+                <small data-translate="add-family-member-subtitle">Please fill in as much information as you know. Don't worry if some fields are empty!</small>
+            </div>
+            <div class="card-body">
+                <form id="familyForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">
+                            <i class="fas fa-user"></i> <span data-translate="full-name-label">Full Name</span> *
+                        </label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" required data-translate="full-name-placeholder" placeholder="Enter complete name">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="chinese_name" class="form-label">
+                                    <i class="fas fa-language"></i> <span data-translate="chinese-name-label">Chinese Name (if any)</span>
+                                </label>
+                                <input type="text" class="form-control" id="chinese_name" name="chinese_name" data-translate="chinese-name-placeholder" placeholder="中文名字">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nickname" class="form-label">
+                                    <i class="fas fa-heart"></i> <span data-translate="nickname-label">Nickname/Friendly Name</span>
+                                </label>
+                                <input type="text" class="form-control" id="nickname" name="nickname" data-translate="nickname-placeholder" placeholder="What do family members call them?">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">
+                                    <i class="fas fa-venus-mars"></i> Gender *
+                                </label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="is_alive" class="form-label">
+                                    <i class="fas fa-heart"></i> Current Status
+                                </label>
+                                <select class="form-select" id="is_alive" name="is_alive">
+                                    <option value="true">Living</option>
+                                    <option value="false">Deceased</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="birth_date" class="form-label">
+                                    <i class="fas fa-birthday-cake"></i> Birth Date
+                                </label>
+                                <input type="date" class="form-control" id="birth_date" name="birth_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="birth_place" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Birth Place
+                                </label>
+                                <input type="text" class="form-control" id="birth_place" name="birth_place" placeholder="City, Country">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3" id="death_date_container" style="display: none;">
+                                <label for="death_date" class="form-label">
+                                    <i class="fas fa-cross"></i> Death Date
+                                </label>
+                                <input type="date" class="form-control" id="death_date" name="death_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3" id="death_place_container" style="display: none;">
+                                <label for="death_place" class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Death Place
+                                </label>
+                                <input type="text" class="form-control" id="death_place" name="death_place" placeholder="City, Country">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">
+                            <i class="fas fa-camera"></i> <span data-translate="photo-label">Photo (Optional)</span>
+                        </label>
+                        <div class="photo-upload-area" onclick="document.getElementById('photo').click()">
+                            <div class="text-center">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">Click to upload or drag & drop</h6>
+                                <p class="text-muted small">Maximum file size: 5MB. Supported formats: JPG, PNG, GIF, WebP</p>
+                            </div>
+                        </div>
+                        <input type="file" class="form-control d-none" id="photo" name="photo" accept="image/*">
+                        <div id="photoPreview" class="mt-3 text-center" style="display: none;">
+                            <div class="photo-preview d-inline-block">
+                                <img id="previewImg" src="" alt="Photo preview" class="img-fluid" style="max-width: 200px; max-height: 200px; border-radius: var(--radius-lg);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="marital_status" class="form-label">
+                                    <i class="fas fa-heart"></i> Marital Status
+                                </label>
+                                <select class="form-select" id="marital_status" name="marital_status">
+                                    <option value="">Select Marital Status</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- This column will be used for conditional fields -->
+                        </div>
+                    </div>
+
+                    <!-- Conditional fields for Single status -->
+                    <div id="single_status_fields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="father_name" class="form-label">
+                                        <i class="fas fa-male"></i> Father's Name
+                                    </label>
+                                    <input type="text" class="form-control" id="father_name" name="father_name" placeholder="Enter father's full name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mother_name" class="form-label">
+                                        <i class="fas fa-female"></i> Mother's Name
+                                    </label>
+                                    <input type="text" class="form-control" id="mother_name" name="mother_name" placeholder="Enter mother's full name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conditional fields for Married status -->
+                    <div id="married_status_fields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="spouse_name" class="form-label">
+                                        <i class="fas fa-heart"></i> Spouse's Name
+                                    </label>
+                                    <input type="text" class="form-control" id="spouse_name" name="spouse_name" placeholder="Enter spouse's full name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-child"></i> Have Children
+                                    </label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="have_children" id="have_children_yes" value="Yes">
+                                        <label class="form-check-label" for="have_children_yes">
+                                            Yes
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="have_children" id="have_children_no" value="No">
+                                        <label class="form-check-label" for="have_children_no">
+                                            No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Children section -->
+                    <div id="children_section" style="display: none;">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-child"></i> Children Information</h5>
+                                <button type="button" class="btn btn-success btn-sm" id="add_child_btn">
+                                    <i class="fas fa-plus"></i> Add Child
+                                </button>
+                            </div>
+                        </div>
+                        <div id="children_container">
+                            <!-- Children forms will be added here dynamically -->
+                        </div>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Additional Notes
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any special memories, stories, or additional information about this person..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-outline-secondary me-md-2" onclick="clearForm()">
+                            <i class="fas fa-eraser"></i> <span data-translate="clear-form-btn">Clear Form</span>
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> <span data-translate="save-member-btn">Save Family Member</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                    <i class="fas fa-check-circle"></i> <span data-translate="success-message">Family member added successfully! Thank you for contributing to our family tree.</span>
+                </div>
+
+                <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="errorText"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5><i class="fas fa-lightbulb"></i> <span data-translate="tips-title">Tips for Adding Information:</span></h5>
+                <ul class="mb-0">
+                    <li><strong data-translate="tip-1">Don't worry about being perfect:</strong> <span data-translate="tip-1">Any information you can provide helps!</span></li>
+                    <li><strong data-translate="tip-2">Full Name:</strong> <span data-translate="tip-2">Enter the complete name as it appears on official documents</span></li>
+                    <li><strong data-translate="tip-3">Chinese Name (if any):</strong> <span data-translate="tip-3">Add traditional or simplified Chinese characters if known</span></li>
+                    <li><strong data-translate="tip-4">Nickname:</strong> <span data-translate="tip-4">Include any family nicknames or friendly names they were called</span></li>
+                    <li><strong data-translate="tip-5">Photos:</strong> <span data-translate="tip-5">Upload a clear photo (max 5MB) - JPG, PNG, GIF, or WebP formats</span></li>
+                    <li><strong data-translate="tip-6">Dates:</strong> <span data-translate="tip-6">If you don't know the exact date, you can leave it blank</span></li>
+                    <li><strong data-translate="tip-7">Places:</strong> <span data-translate="tip-7">Include city and country if possible (e.g., "Manila, Philippines")</span></li>
+                    <li><strong data-translate="tip-8">Notes:</strong> <span data-translate="tip-8">Share any stories, memories, or special information about this person</span></li>
+                    <li><strong data-translate="tip-9">Need help?</strong> <span data-translate="tip-9">Contact an administrator if you have questions</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Modern photo upload with drag & drop
+const photoUploadArea = document.querySelector('.photo-upload-area');
+const photoInput = document.getElementById('photo');
+
+// Drag and drop functionality
+photoUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+photoUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+
+photoUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFile(files[0]);
+    }
+});
+
+// File input change
+photoInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        handleFile(file);
+    }
+});
+
+function handleFile(file) {
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+    }
+    
+    // Check file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        photoInput.value = '';
+        return;
+    }
+    
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('photoPreview').style.display = 'block';
+        photoUploadArea.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+// Reset photo upload
+function resetPhotoUpload() {
+    photoInput.value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    photoUploadArea.style.display = 'block';
+}
+
+// Handle status change to show/hide death date and death place fields
+document.getElementById('is_alive').addEventListener('change', function() {
+    const deathDateContainer = document.getElementById('death_date_container');
+    const deathDateInput = document.getElementById('death_date');
+    const deathPlaceContainer = document.getElementById('death_place_container');
+    const deathPlaceInput = document.getElementById('death_place');
+    
+    if (this.value === 'false') {
+        // Show death fields when status is "Deceased"
+        deathDateContainer.style.display = 'block';
+        deathPlaceContainer.style.display = 'block';
+        deathDateInput.setAttribute('required', 'required');
+    } else {
+        // Hide death fields when status is "Living"
+        deathDateContainer.style.display = 'none';
+        deathPlaceContainer.style.display = 'none';
+        deathDateInput.removeAttribute('required');
+        deathDateInput.value = ''; // Clear the value when hiding
+        deathPlaceInput.value = ''; // Clear the value when hiding
+    }
+});
+
+// Handle marital status change
+document.getElementById('marital_status').addEventListener('change', function() {
+    const singleFields = document.getElementById('single_status_fields');
+    const marriedFields = document.getElementById('married_status_fields');
+    const childrenSection = document.getElementById('children_section');
+    
+    // Hide all conditional sections first
+    singleFields.style.display = 'none';
+    marriedFields.style.display = 'none';
+    childrenSection.style.display = 'none';
+    
+    // Clear all related fields
+    document.getElementById('father_name').value = '';
+    document.getElementById('mother_name').value = '';
+    document.getElementById('spouse_name').value = '';
+    document.querySelectorAll('input[name="have_children"]').forEach(radio => radio.checked = false);
+    document.getElementById('children_container').innerHTML = '';
+    
+    if (this.value === 'Single') {
+        singleFields.style.display = 'block';
+    } else if (this.value === 'Married') {
+        marriedFields.style.display = 'block';
+    }
+});
+
+// Handle "Have Children" radio buttons
+document.addEventListener('change', function(e) {
+    if (e.target.name === 'have_children') {
+        const childrenSection = document.getElementById('children_section');
+        const childrenContainer = document.getElementById('children_container');
+        
+        if (e.target.value === 'Yes') {
+            childrenSection.style.display = 'block';
+            // Add first child form if none exist
+            if (childrenContainer.children.length === 0) {
+                addChildForm();
+            }
+        } else {
+            childrenSection.style.display = 'none';
+            childrenContainer.innerHTML = '';
+        }
+    }
+});
+
+// Child management functions
+let childCounter = 0;
+
+function addChildForm() {
+    childCounter++;
+    const childrenContainer = document.getElementById('children_container');
+    
+    const childForm = document.createElement('div');
+    childForm.className = 'child-form border rounded p-3 mb-3';
+    childForm.id = `child_${childCounter}`;
+    
+    childForm.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0"><i class="fas fa-child"></i> Child #${childCounter}</h6>
+            <button type="button" class="btn btn-danger btn-sm remove-child-btn" data-child-id="${childCounter}">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        </div>
+        
+        <!-- Basic Information -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Child's Full Name *</label>
+                    <input type="text" class="form-control" name="child_full_name_${childCounter}" placeholder="Enter child's full name" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Chinese Name (if any)</label>
+                    <input type="text" class="form-control" name="child_chinese_name_${childCounter}" placeholder="中文名字">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Nickname/Friendly Name</label>
+                    <input type="text" class="form-control" name="child_nickname_${childCounter}" placeholder="What do family members call them?">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Gender *</label>
+                    <select class="form-select" name="child_gender_${childCounter}" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Birth Information -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Date of Birth *</label>
+                    <input type="date" class="form-control" name="child_birth_date_${childCounter}" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Birth Place</label>
+                    <input type="text" class="form-control" name="child_birth_place_${childCounter}" placeholder="City, Country">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Information -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Current Status *</label>
+                    <select class="form-select" name="child_is_alive_${childCounter}" required>
+                        <option value="">Select Status</option>
+                        <option value="true">Living</option>
+                        <option value="false">Deceased</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3" id="child_death_date_container_${childCounter}" style="display: none;">
+                    <label class="form-label">Death Date</label>
+                    <input type="date" class="form-control" name="child_death_date_${childCounter}">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3" id="child_death_place_container_${childCounter}" style="display: none;">
+                    <label class="form-label">Death Place</label>
+                    <input type="text" class="form-control" name="child_death_place_${childCounter}" placeholder="City, Country">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Photo Upload -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label">Photo (Optional)</label>
+                    <input type="file" class="form-control" name="child_photo_${childCounter}" accept="image/*">
+                    <div class="form-text">Maximum file size: 5MB. Supported formats: JPG, PNG, GIF, WebP</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Notes -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label">Additional Notes</label>
+                    <textarea class="form-control" name="child_notes_${childCounter}" rows="2" placeholder="Any special memories, stories, or additional information about this child..."></textarea>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    childrenContainer.appendChild(childForm);
+    
+    // Add event listener for child status change
+    const childStatusSelect = childForm.querySelector(`select[name="child_is_alive_${childCounter}"]`);
+    const childDeathDateContainer = childForm.querySelector(`#child_death_date_container_${childCounter}`);
+    const childDeathPlaceContainer = childForm.querySelector(`#child_death_place_container_${childCounter}`);
+    const childDeathDateInput = childForm.querySelector(`input[name="child_death_date_${childCounter}"]`);
+    
+    childStatusSelect.addEventListener('change', function() {
+        if (this.value === 'false') {
+            childDeathDateContainer.style.display = 'block';
+            childDeathPlaceContainer.style.display = 'block';
+            childDeathDateInput.required = true;
+        } else {
+            childDeathDateContainer.style.display = 'none';
+            childDeathPlaceContainer.style.display = 'none';
+            childDeathDateInput.required = false;
+            childDeathDateInput.value = '';
+            childForm.querySelector(`input[name="child_death_place_${childCounter}"]`).value = '';
+        }
+    });
+}
+
+// Add child button event listener
+document.getElementById('add_child_btn').addEventListener('click', addChildForm);
+
+// Remove child button event delegation
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-child-btn')) {
+        const childId = e.target.getAttribute('data-child-id');
+        const childForm = document.getElementById(`child_${childId}`);
+        if (childForm) {
+            childForm.remove();
+        }
+    }
+});
+
+document.getElementById('familyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate death date if status is deceased
+    const statusSelect = document.getElementById('is_alive');
+    const deathDateInput = document.getElementById('death_date');
+    
+    if (statusSelect.value === 'false' && !deathDateInput.value) {
+        alert('Please enter a death date for deceased family members.');
+        return;
+    }
+    
+    // Validate marital status fields
+    const maritalStatus = document.getElementById('marital_status').value;
+    if (maritalStatus === 'Single') {
+        const fatherName = document.getElementById('father_name').value;
+        const motherName = document.getElementById('mother_name').value;
+        if (!fatherName || !motherName) {
+            alert('Please enter both father\'s and mother\'s names for single family members.');
+            return;
+        }
+    } else if (maritalStatus === 'Married') {
+        const spouseName = document.getElementById('spouse_name').value;
+        const haveChildren = document.querySelector('input[name="have_children"]:checked');
+        if (!spouseName) {
+            alert('Please enter spouse\'s name for married family members.');
+            return;
+        }
+        if (!haveChildren) {
+            alert('Please select whether you have children.');
+            return;
+        }
+        if (haveChildren.value === 'Yes') {
+            const childForms = document.querySelectorAll('.child-form');
+            if (childForms.length === 0) {
+                alert('Please add at least one child.');
+                return;
+            }
+            // Validate each child form
+            for (let i = 0; i < childForms.length; i++) {
+                const childForm = childForms[i];
+                const fullName = childForm.querySelector('input[name^="child_full_name_"]').value;
+                const gender = childForm.querySelector('select[name^="child_gender_"]').value;
+                const birthDate = childForm.querySelector('input[name^="child_birth_date_"]').value;
+                const status = childForm.querySelector('select[name^="child_is_alive_"]').value;
+                const deathDate = childForm.querySelector('input[name^="child_death_date_"]').value;
+                
+                if (!fullName || !gender || !birthDate || !status) {
+                    alert(`Please fill in child #${i + 1}'s required fields: Full Name, Gender, Birth Date, and Status.`);
+                    return;
+                }
+                
+                if (status === 'false' && !deathDate) {
+                    alert(`Please fill in child #${i + 1}'s death date since status is set to Deceased.`);
+                    return;
+                }
+            }
+        }
+    }
+    
+    const formData = new FormData(this);
+    
+    // Collect children data
+    const childrenData = [];
+    const childForms = document.querySelectorAll('.child-form');
+    childForms.forEach((childForm, index) => {
+        const childData = {
+            child_full_name: childForm.querySelector('input[name^="child_full_name_"]').value,
+            child_chinese_name: childForm.querySelector('input[name^="child_chinese_name_"]').value,
+            child_nickname: childForm.querySelector('input[name^="child_nickname_"]').value,
+            child_gender: childForm.querySelector('select[name^="child_gender_"]').value,
+            child_birth_date: childForm.querySelector('input[name^="child_birth_date_"]').value,
+            child_birth_place: childForm.querySelector('input[name^="child_birth_place_"]').value,
+            child_is_alive: childForm.querySelector('select[name^="child_is_alive_"]').value,
+            child_death_date: childForm.querySelector('input[name^="child_death_date_"]').value,
+            child_death_place: childForm.querySelector('input[name^="child_death_place_"]').value,
+            child_notes: childForm.querySelector('textarea[name^="child_notes_"]').value
+        };
+        childrenData.push(childData);
+    });
+    
+    // Add children data to form data
+    if (childrenData.length > 0) {
+        formData.append('children_data', JSON.stringify(childrenData));
+    }
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    fetch('/api/add-member', {
+        method: 'POST',
+        body: formData  // Send as FormData for file upload
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Handle pending relationship creation
+            if (window.pendingRelationship) {
+                createRelationshipAfterMemberAdded(result.id, window.pendingRelationship);
+            }
+            
+            this.reset();
+            document.getElementById('photoPreview').style.display = 'none';
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorText').textContent = result.message;
+            document.getElementById('successMessage').style.display = 'none';
+        }
+    })
+    .catch(error => {
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorText').textContent = 'An error occurred. Please try again.';
+        document.getElementById('successMessage').style.display = 'none';
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+function clearForm() {
+    document.getElementById('familyForm').reset();
+    document.getElementById('successMessage').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+    resetPhotoUpload();
+    
+    // Reset death date and death place field visibility
+    const deathDateContainer = document.getElementById('death_date_container');
+    const deathDateInput = document.getElementById('death_date');
+    const deathPlaceContainer = document.getElementById('death_place_container');
+    deathDateContainer.style.display = 'none';
+    deathPlaceContainer.style.display = 'none';
+    deathDateInput.removeAttribute('required');
+    
+    // Reset marital status conditional fields
+    const singleFields = document.getElementById('single_status_fields');
+    const marriedFields = document.getElementById('married_status_fields');
+    const childrenSection = document.getElementById('children_section');
+    singleFields.style.display = 'none';
+    marriedFields.style.display = 'none';
+    childrenSection.style.display = 'none';
+    
+    // Clear children container
+    document.getElementById('children_container').innerHTML = '';
+    childCounter = 0;
+}
+
+// Relationship Detection Functions
+let relationshipSuggestions = [];
+
+function checkExistingNames(fieldName, fieldValue) {
+    if (!fieldValue || fieldValue.length < 2) return;
+    
+    fetch('/api/check-existing-names', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            full_name: fieldValue
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.matches.length > 0) {
+            showNameSuggestions(fieldName, data.matches);
+        }
+    })
+    .catch(error => {
+        console.error('Error checking existing names:', error);
+    });
+}
+
+function showNameSuggestions(fieldName, matches) {
+    const field = document.getElementById(fieldName);
+    const container = document.getElementById(fieldName + '_suggestions');
+    
+    if (!container) {
+        // Create suggestions container
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.id = fieldName + '_suggestions';
+        suggestionsDiv.className = 'suggestions-container';
+        field.parentNode.appendChild(suggestionsDiv);
+    }
+    
+    const suggestionsDiv = document.getElementById(fieldName + '_suggestions');
+    suggestionsDiv.innerHTML = '';
+    
+    if (matches.length > 0) {
+        const title = document.createElement('div');
+        title.className = 'suggestions-title';
+        title.innerHTML = `<i class="fas fa-lightbulb"></i> Found ${matches.length} matching name(s) in database:`;
+        suggestionsDiv.appendChild(title);
+        
+        matches.forEach(match => {
+            const suggestion = document.createElement('div');
+            suggestion.className = 'suggestion-item';
+            suggestion.innerHTML = `
+                <div class="suggestion-info">
+                    <strong>${match.full_name}</strong>
+                    ${match.chinese_name ? `<br><small>Chinese: ${match.chinese_name}</small>` : ''}
+                    ${match.nickname ? `<br><small>Nickname: ${match.nickname}</small>` : ''}
+                    <br><small>Gender: ${match.gender} | Status: ${match.is_alive ? 'Living' : 'Deceased'}</small>
+                </div>
+                <div class="suggestion-actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="useExistingName('${fieldName}', '${match.full_name}')">
+                        <i class="fas fa-check"></i> Use This Name
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" onclick="suggestRelationship('${fieldName}', ${match.id}, '${match.full_name}')">
+                        <i class="fas fa-link"></i> Create Relationship
+                    </button>
+                </div>
+            `;
+            suggestionsDiv.appendChild(suggestion);
+        });
+    }
+}
+
+function useExistingName(fieldName, name) {
+    document.getElementById(fieldName).value = name;
+    hideSuggestions(fieldName);
+}
+
+function suggestRelationship(fieldName, memberId, memberName) {
+    const relationshipType = getRelationshipType(fieldName);
+    const suggestion = {
+        field: fieldName,
+        memberId: memberId,
+        memberName: memberName,
+        relationshipType: relationshipType
+    };
+    
+    relationshipSuggestions.push(suggestion);
+    showRelationshipConfirmation(suggestion);
+}
+
+function getRelationshipType(fieldName) {
+    if (fieldName === 'father_name') return 'parent';
+    if (fieldName === 'mother_name') return 'parent';
+    if (fieldName === 'spouse_name') return 'spouse';
+    return 'unknown';
+}
+
+function showRelationshipConfirmation(suggestion) {
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'relationship-confirmation';
+    confirmationDiv.innerHTML = `
+        <div class="alert alert-info">
+            <i class="fas fa-link"></i> 
+            <strong>Relationship Suggestion:</strong> 
+            Create ${suggestion.relationshipType} relationship with "${suggestion.memberName}"?
+            <div class="mt-2">
+                <button class="btn btn-sm btn-success" onclick="confirmRelationship(${suggestion.memberId}, '${suggestion.relationshipType}')">
+                    <i class="fas fa-check"></i> Yes, Create Relationship
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="cancelRelationship('${suggestion.field}')">
+                    <i class="fas fa-times"></i> No, Just Use Name
+                </button>
+            </div>
+        </div>
+    `;
+    
+    const field = document.getElementById(suggestion.field);
+    field.parentNode.appendChild(confirmationDiv);
+}
+
+function confirmRelationship(memberId, relationshipType) {
+    // This will be called after the form is submitted and we have the new member ID
+    // For now, we'll store it for later processing
+    window.pendingRelationship = {
+        memberId: memberId,
+        relationshipType: relationshipType
+    };
+    
+    // Hide confirmation
+    document.querySelector('.relationship-confirmation').remove();
+}
+
+function cancelRelationship(fieldName) {
+    document.querySelector('.relationship-confirmation').remove();
+    hideSuggestions(fieldName);
+}
+
+function hideSuggestions(fieldName) {
+    const suggestionsDiv = document.getElementById(fieldName + '_suggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.remove();
+    }
+}
+
+function createRelationshipAfterMemberAdded(newMemberId, pendingRelationship) {
+    fetch('/api/create-relationship', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            member_id: newMemberId,
+            related_member_id: pendingRelationship.memberId,
+            relationship_type: pendingRelationship.relationshipType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message for relationship creation
+            const relationshipMessage = document.createElement('div');
+            relationshipMessage.className = 'alert alert-success mt-2';
+            relationshipMessage.innerHTML = `
+                <i class="fas fa-link"></i> 
+                <strong>Relationship Created!</strong> 
+                Family relationship has been automatically established.
+            `;
+            document.getElementById('successMessage').appendChild(relationshipMessage);
+        } else {
+            console.warn('Relationship creation failed:', data.message);
+        }
+        
+        // Clear pending relationship
+        window.pendingRelationship = null;
+    })
+    .catch(error => {
+        console.error('Error creating relationship:', error);
+        window.pendingRelationship = null;
+    });
+}
+
+// Add event listeners for name checking
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for existing names when typing in family name fields
+    const familyFields = ['father_name', 'mother_name', 'spouse_name'];
+    
+    familyFields.forEach(fieldName => {
+        const field = document.getElementById(fieldName);
+        if (field) {
+            let timeout;
+            field.addEventListener('input', function() {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    checkExistingNames(fieldName, this.value);
+                }, 500); // Wait 500ms after user stops typing
+            });
+            
+            // Hide suggestions when clicking outside
+            field.addEventListener('blur', function() {
+                setTimeout(() => {
+                    hideSuggestions(fieldName);
+                }, 200);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

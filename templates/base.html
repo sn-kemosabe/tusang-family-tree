@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TU SANG Family Tree</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                // Navigation
+                'app-title': 'TU SANG Family Tree',
+                'add-family-member': 'Add Family Member',
+                'view-family-tree': 'View Family Tree',
+                'admin-login': 'Admin Login',
+                'admin-dashboard': 'Admin Dashboard',
+                'logout': 'Logout',
+                'language-toggle': 'Language',
+                'copyright': '© TU SANG Family Tree. Built with love for our family.',
+                
+                // Homepage
+                'welcome-title': 'Welcome to TU SANG Family Tree',
+                'welcome-subtitle': 'Preserve your family history and connect generations',
+                'add-member-card-title': 'Add Family Member',
+                'add-member-card-text': 'Help us build our family tree by adding information about family members.',
+                'add-member-btn': 'Add Member',
+                'view-tree-card-title': 'View Family Tree',
+                'view-tree-card-text': 'Explore our family connections and see how we\'re all related.',
+                'view-tree-btn': 'View Tree',
+                'how-to-use-title': 'How to Use This Site',
+                'for-family-members': 'For Family Members:',
+                'for-administrators': 'For Administrators:',
+                'family-member-tip-1': 'Click "Add Family Member" to enter information',
+                'family-member-tip-2': 'Fill in as much information as you know',
+                'family-member-tip-3': 'Don\'t worry about making mistakes - admins can fix them',
+                'admin-tip-1': 'Login to manage and verify information',
+                'admin-tip-2': 'Create family relationships',
+                'admin-tip-3': 'Generate printable family trees',
+                
+                // Family Form
+                'add-family-member-title': 'Add Family Member Information',
+                'add-family-member-subtitle': 'Please fill in as much information as you know. Don\'t worry if some fields are empty!',
+                'full-name-label': 'Full Name',
+                'full-name-placeholder': 'Enter complete name',
+                'chinese-name-label': 'Chinese Characters',
+                'chinese-name-placeholder': '中文名字',
+                'nickname-label': 'Nickname/Friendly Name',
+                'nickname-placeholder': 'What do family members call them?',
+                'gender-label': 'Gender',
+                'gender-placeholder': 'Select Gender',
+                'status-label': 'Status',
+                'birth-date-label': 'Birth Date',
+                'death-date-label': 'Death Date',
+                'birth-place-label': 'Birth Place',
+                'birth-place-placeholder': 'City, Country',
+                'death-place-label': 'Death Place',
+                'death-place-placeholder': 'City, Country',
+                'photo-label': 'Photo (Optional)',
+                'photo-help': 'Maximum file size: 5MB. Supported formats: JPG, PNG, GIF, WebP',
+                'notes-label': 'Additional Notes',
+                'notes-placeholder': 'Any special memories, stories, or additional information about this person...',
+                'clear-form-btn': 'Clear Form',
+                'save-member-btn': 'Save Family Member',
+                'success-message': 'Family member added successfully! Thank you for contributing to our family tree.',
+                'tips-title': 'Tips for Adding Information:',
+                'tip-1': 'Don\'t worry about being perfect: Any information you can provide helps!',
+                'tip-2': 'Full Name: Enter the complete name as it appears on official documents',
+                'tip-3': 'Chinese Characters: Add traditional or simplified Chinese characters if known',
+                'tip-4': 'Nickname: Include any family nicknames or friendly names they were called',
+                'tip-5': 'Photos: Upload a clear photo (max 5MB) - JPG, PNG, GIF, or WebP formats',
+                'tip-6': 'Dates: If you don\'t know the exact date, you can leave it blank',
+                'tip-7': 'Places: Include city and country if possible (e.g., "Manila, Philippines")',
+                'tip-8': 'Notes: Share any stories, memories, or special information about this person',
+                'tip-9': 'Need help? Contact an administrator if you have questions',
+                
+                // Family Tree
+                'family-tree-title': 'Family Tree Visualization',
+                'zoom-in': 'Zoom In',
+                'zoom-out': 'Zoom Out',
+                'reset-view': 'Reset View',
+                'print-tree': 'Print Family Tree',
+                'member-details-title': 'Family Member Details',
+                'basic-information': 'Basic Information',
+                'dates': 'Dates',
+                'full-name': 'Full Name',
+                'chinese-name': 'Chinese Name',
+                'nickname': 'Nickname',
+                'gender': 'Gender',
+                'status': 'Status',
+                'birth': 'Birth',
+                'death': 'Death',
+                'living': 'Living',
+                'deceased': 'Deceased',
+                'unknown': 'Unknown',
+                
+                // Login
+                'login-title': 'Admin Login',
+                'username-label': 'Username',
+                'password-label': 'Password',
+                'remember-me': 'Remember Me',
+                'login-btn': 'Login',
+                
+                // Admin Dashboard
+                'admin-dashboard-title': 'Admin Dashboard',
+                'total-members': 'Total Members',
+                'living-members': 'Living Members',
+                'deceased-members': 'Deceased Members',
+                'with-birth-dates': 'With Birth Dates',
+                'family-members-management': 'Family Members Management',
+                'name': 'Name',
+                'chinese-name': 'Chinese Name',
+                'nickname': 'Nickname',
+                'gender': 'Gender',
+                'birth-date': 'Birth Date',
+                'status': 'Status',
+                'actions': 'Actions',
+                'quick-actions': 'Quick Actions',
+                'add-relationship': 'Add Family Relationship',
+                'export-data': 'Export Family Data',
+                'generate-report': 'Generate Family Report',
+                'system-management': 'System Management',
+                'backup-data': 'Backup Database',
+                'validate-data': 'Validate Data',
+                'print-tree': 'Print Family Tree',
+                'edit-member-title': 'Edit Family Member',
+                'cancel': 'Cancel',
+                'save-changes': 'Save Changes'
+            },
+            ms: {
+                // Navigation
+                'app-title': 'Pokok Keluarga TU SANG',
+                'add-family-member': 'Tambah Ahli Keluarga',
+                'view-family-tree': 'Lihat Pokok Keluarga',
+                'admin-login': 'Log Masuk Admin',
+                'admin-dashboard': 'Dashboard Pentadbir',
+                'logout': 'Log Keluar',
+                'language-toggle': 'Bahasa',
+                'copyright': '© 2024 Pokok Keluarga TU SANG. Dibina dengan kasih sayang untuk keluarga kami.',
+                
+                // Homepage
+                'welcome-title': 'Selamat Datang ke Pokok Keluarga TU SANG',
+                'welcome-subtitle': 'Jaga sejarah keluarga dan hubungkan generasi',
+                'add-member-card-title': 'Tambah Ahli Keluarga',
+                'add-member-card-text': 'Bantu kami membina pokok keluarga dengan menambah maklumat tentang ahli keluarga.',
+                'add-member-btn': 'Tambah Ahli',
+                'view-tree-card-title': 'Lihat Pokok Keluarga',
+                'view-tree-card-text': 'Terokai hubungan keluarga kami dan lihat bagaimana kita semua berkaitan.',
+                'view-tree-btn': 'Lihat Pokok',
+                'how-to-use-title': 'Cara Menggunakan Laman Web Ini',
+                'for-family-members': 'Untuk Ahli Keluarga:',
+                'for-administrators': 'Untuk Pentadbir:',
+                'family-member-tip-1': 'Klik "Tambah Ahli Keluarga" untuk memasukkan maklumat',
+                'family-member-tip-2': 'Isi sebanyak maklumat yang anda tahu',
+                'family-member-tip-3': 'Jangan risau tentang kesilapan - pentadbir boleh membetulkannya',
+                'admin-tip-1': 'Log masuk untuk mengurus dan mengesahkan maklumat',
+                'admin-tip-2': 'Cipta hubungan keluarga',
+                'admin-tip-3': 'Hasilkan pokok keluarga yang boleh dicetak',
+                
+                // Family Form
+                'add-family-member-title': 'Tambah Maklumat Ahli Keluarga',
+                'add-family-member-subtitle': 'Sila isi sebanyak maklumat yang anda tahu. Jangan risau jika sesetengah medan kosong!',
+                'full-name-label': 'Nama Penuh',
+                'full-name-placeholder': 'Masukkan nama lengkap',
+                'chinese-name-label': 'Aksara Cina',
+                'chinese-name-placeholder': '中文名字',
+                'nickname-label': 'Nama Panggilan/Nama Mesra',
+                'nickname-placeholder': 'Apa yang ahli keluarga panggil mereka?',
+                'gender-label': 'Jantina',
+                'gender-placeholder': 'Pilih Jantina',
+                'status-label': 'Status',
+                'birth-date-label': 'Tarikh Lahir',
+                'death-date-label': 'Tarikh Kematian',
+                'birth-place-label': 'Tempat Lahir',
+                'birth-place-placeholder': 'Bandar, Negara',
+                'death-place-label': 'Tempat Kematian',
+                'death-place-placeholder': 'Bandar, Negara',
+                'photo-label': 'Foto (Pilihan)',
+                'photo-help': 'Saiz fail maksimum: 5MB. Format yang disokong: JPG, PNG, GIF, WebP',
+                'notes-label': 'Nota Tambahan',
+                'notes-placeholder': 'Sebarang kenangan istimewa, cerita, atau maklumat tambahan tentang orang ini...',
+                'clear-form-btn': 'Kosongkan Borang',
+                'save-member-btn': 'Simpan Ahli Keluarga',
+                'success-message': 'Ahli keluarga berjaya ditambah! Terima kasih kerana menyumbang kepada pokok keluarga kami.',
+                'tips-title': 'Petua untuk Menambah Maklumat:',
+                'tip-1': 'Jangan risau tentang kesempurnaan: Sebarang maklumat yang anda boleh berikan membantu!',
+                'tip-2': 'Nama Penuh: Masukkan nama lengkap seperti yang muncul pada dokumen rasmi',
+                'tip-3': 'Aksara Cina: Tambah aksara Cina tradisional atau ringkas jika diketahui',
+                'tip-4': 'Nama Panggilan: Masukkan sebarang nama panggilan keluarga atau nama mesra yang mereka dipanggil',
+                'tip-5': 'Foto: Muat naik foto yang jelas (maksimum 5MB) - format JPG, PNG, GIF, atau WebP',
+                'tip-6': 'Tarikh: Jika anda tidak tahu tarikh yang tepat, anda boleh membiarkannya kosong',
+                'tip-7': 'Tempat: Masukkan bandar dan negara jika mungkin (cth., "Manila, Filipina")',
+                'tip-8': 'Nota: Kongsi sebarang cerita, kenangan, atau maklumat istimewa tentang orang ini',
+                'tip-9': 'Perlu bantuan? Hubungi pentadbir jika anda mempunyai soalan',
+                
+                // Family Tree
+                'family-tree-title': 'Visualisasi Pokok Keluarga',
+                'zoom-in': 'Zum Masuk',
+                'zoom-out': 'Zum Keluar',
+                'reset-view': 'Set Semula Pandangan',
+                'print-tree': 'Cetak Pokok Keluarga',
+                'member-details-title': 'Butiran Ahli Keluarga',
+                'basic-information': 'Maklumat Asas',
+                'dates': 'Tarikh',
+                'full-name': 'Nama Penuh',
+                'chinese-name': 'Nama Cina',
+                'nickname': 'Nama Panggilan',
+                'gender': 'Jantina',
+                'status': 'Status',
+                'birth': 'Lahir',
+                'death': 'Mati',
+                'living': 'Hidup',
+                'deceased': 'Meninggal',
+                'unknown': 'Tidak Diketahui',
+                
+                // Login
+                'login-title': 'Log Masuk Admin',
+                'username-label': 'Nama Pengguna',
+                'password-label': 'Kata Laluan',
+                'remember-me': 'Ingat Saya',
+                'login-btn': 'Log Masuk',
+                
+                // Admin Dashboard
+                'admin-dashboard-title': 'Dashboard Pentadbir',
+                'total-members': 'Jumlah Ahli',
+                'living-members': 'Ahli Hidup',
+                'deceased-members': 'Ahli Meninggal',
+                'with-birth-dates': 'Dengan Tarikh Lahir',
+                'family-members-management': 'Pengurusan Ahli Keluarga',
+                'name': 'Nama',
+                'chinese-name': 'Nama Cina',
+                'nickname': 'Nama Panggilan',
+                'gender': 'Jantina',
+                'birth-date': 'Tarikh Lahir',
+                'status': 'Status',
+                'actions': 'Tindakan',
+                'quick-actions': 'Tindakan Pantas',
+                'add-relationship': 'Tambah Hubungan Keluarga',
+                'export-data': 'Eksport Data Keluarga',
+                'generate-report': 'Hasilkan Laporan Keluarga',
+                'system-management': 'Pengurusan Sistem',
+                'backup-data': 'Sandaran Pangkalan Data',
+                'validate-data': 'Sahkan Data',
+                'print-tree': 'Cetak Pokok Keluarga',
+                'edit-member-title': 'Edit Ahli Keluarga',
+                'cancel': 'Batal',
+                'save-changes': 'Simpan Perubahan'
+            }
+        };
+        
+        // Get current language from localStorage or default to English
+        let currentLanguage = localStorage.getItem('language') || 'en';
+        
+        // Function to translate text
+        function translateText(key) {
+            return translations[currentLanguage][key] || translations['en'][key] || key;
+        }
+        
+        // Function to switch language
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            updateUI();
+        }
+        
+        // Function to update UI with current language
+        function updateUI() {
+            // Update navigation
+            const navbarBrand = document.querySelector('.navbar-brand');
+            if (navbarBrand) {
+                navbarBrand.innerHTML = `<i class="fas fa-tree"></i> ${translateText('app-title')}`;
+            }
+            
+            const addMemberLink = document.querySelector('a[href*="family_form"]');
+            if (addMemberLink) {
+                addMemberLink.innerHTML = `<i class="fas fa-user-plus"></i> ${translateText('add-family-member')}`;
+            }
+            
+            const viewTreeLink = document.querySelector('a[href*="family_tree"]');
+            if (viewTreeLink) {
+                viewTreeLink.innerHTML = `<i class="fas fa-sitemap"></i> ${translateText('view-family-tree')}`;
+            }
+            
+            const loginLink = document.querySelector('a[href*="login"]');
+            if (loginLink) {
+                loginLink.innerHTML = `<i class="fas fa-sign-in-alt"></i> ${translateText('admin-login')}`;
+            }
+            
+            // Update footer
+            const footer = document.querySelector('footer p');
+            if (footer) {
+                footer.textContent = translateText('copyright');
+            }
+            
+            // Update language toggle button
+            const langToggle = document.getElementById('languageToggle');
+            if (langToggle) {
+                langToggle.innerHTML = `<i class="fas fa-globe"></i> ${translateText('language-toggle')}`;
+            }
+            
+            // Update all elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                const translatedText = translateText(key);
+                
+                // Handle different types of content
+                if (element.tagName === 'INPUT' && element.type === 'submit') {
+                    element.value = translatedText;
+                } else if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+                    element.placeholder = translatedText;
+                } else if (element.tagName === 'LABEL') {
+                    element.textContent = translatedText;
+                } else {
+                    element.textContent = translatedText;
+                }
+            });
+            
+            // Update select options
+            document.querySelectorAll('select option').forEach(option => {
+                const key = option.getAttribute('data-translate');
+                if (key) {
+                    option.textContent = translateText(key);
+                }
+            });
+            
+            // Trigger custom event for other components to update
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: currentLanguage } }));
+        }
+        
+        // Make translations available globally
+        window.translations = translations;
+        
+        // Initialize UI when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUI();
+        });
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-tree"></i> TU SANG Family Tree
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('family_form') }}">
+                            <i class="fas fa-user-plus"></i> Add Family Member
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('family_tree') }}">
+                            <i class="fas fa-sitemap"></i> View Family Tree
+                        </a>
+                    </li>
+                    {% if not current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt"></i> <span data-translate="admin-login">Admin Login</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> <span data-translate="admin-dashboard">Admin Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> <span data-translate="logout">Logout</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageToggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-globe"></i> Language
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="languageToggle">
+                            <li><a class="dropdown-item" href="#" onclick="switchLanguage('en')">
+                                <i class="fas fa-flag-usa"></i> English
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="switchLanguage('ms')">
+                                <i class="fas fa-flag"></i> Bahasa Melayu
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-light text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p>&copy; 2024 TU SANG Family Tree. Built with love for our family.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

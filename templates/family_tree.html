@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-sitemap"></i> <span data-translate="family-tree-title">Family Tree Visualization</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <button class="btn btn-outline-primary" onclick="zoomIn()">
+                            <i class="fas fa-search-plus"></i> <span data-translate="zoom-in">Zoom In</span>
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="zoomOut()">
+                            <i class="fas fa-search-minus"></i> <span data-translate="zoom-out">Zoom Out</span>
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="resetZoom()">
+                            <i class="fas fa-expand-arrows-alt"></i> <span data-translate="reset-view">Reset View</span>
+                        </button>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" onclick="printTree()">
+                            <i class="fas fa-print"></i> <span data-translate="print-tree">Print Family Tree</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="familyTreeContainer" style="overflow: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; min-height: 500px;">
+                    <div id="familyTree" style="min-width: 100%; min-height: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Family Tree Modal -->
+<div class="modal fade" id="memberModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memberModalTitle" data-translate="member-details-title">Family Member Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            <div class="modal-body" id="memberModalBody">
+                <!-- Member details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="close">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let treeData = null;
+let currentZoom = 1;
+
+// Initialize family tree when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initFamilyTree();
+});
+
+function initFamilyTree() {
+    console.log('Initializing family tree...');
+    
+    // Clear any existing content
+    document.getElementById('familyTree').innerHTML = '';
+    
+    // Load family tree data
+    fetch('/api/family-tree-data')
+        .then(response => {
+            console.log('API response received:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Tree data loaded:', data);
+            treeData = data;
+            renderSimpleTree();
+        })
+        .catch(error => {
+            console.error('Error loading family tree data:', error);
+            document.getElementById('familyTree').innerHTML = '<div class="text-center p-5"><h5>Error loading family tree data</h5><p>Check console for details.</p></div>';
+        });
+}
+
+function renderSimpleTree() {
+    console.log('Rendering traditional family tree...');
+    console.log('Members:', treeData.members);
+    console.log('Relationships:', treeData.relationships);
+    
+    if (!treeData || !treeData.members || treeData.members.length === 0) {
+        document.getElementById('familyTree').innerHTML = '<div class="text-center p-5"><h5>No family members found</h5><p>Add some family members to see the tree.</p></div>';
+        return;
+    }
+    
+    // Create traditional family tree layout
+    const container = document.getElementById('familyTree');
+    container.innerHTML = '';
+    
+    // Create SVG for connections
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.pointerEvents = 'none';
+    svg.style.zIndex = '1';
+    container.appendChild(svg);
+    
+    // Traditional family tree dimensions
+        const cardWidth = 240;
+        const cardHeight = 160;
+        const spacingX = 100;
+        const spacingY = 120;
+    
+    // Group members by generation/level for better family tree layout
+    const memberLevels = new Map();
+    const processedMembers = new Set();
+    
+    // Find root members (those with no parents)
+    const rootMembers = treeData.members.filter(member => {
+        return !treeData.relationships.some(rel => rel.child_id === member.id && rel.type === 'parent');
+    });
+    
+    // Assign levels starting from roots
+    function assignLevels(members, level = 0) {
+        members.forEach(member => {
+            if (!processedMembers.has(member.id)) {
+                if (!memberLevels.has(level)) {
+                    memberLevels.set(level, []);
+                }
+                memberLevels.get(level).push(member);
+                processedMembers.add(member.id);
+                
+                // Find children and assign next level
+                const children = treeData.members.filter(child => {
+                    return treeData.relationships.some(rel => 
+                        rel.parent_id === member.id && 
+                        rel.child_id === child.id && 
+                        rel.type === 'parent'
+                    );
+                });
+                
+                if (children.length > 0) {
+                    assignLevels(children, level + 1);
+                }
+            }
+        });
+    }
+    
+    assignLevels(rootMembers);
+    
+    // Calculate layout dimensions
+    const maxMembersPerLevel = Math.max(...Array.from(memberLevels.values()).map(level => level.length));
+    const totalLevels = memberLevels.size;
+    
+    // Create traditional member cards with level-based positioning
+    let memberIndex = 0;
+    memberLevels.forEach((levelMembers, level) => {
+        levelMembers.forEach((member, indexInLevel) => {
+            // Center siblings horizontally
+            const levelWidth = levelMembers.length * (cardWidth + spacingX) - spacingX;
+            const startX = (maxMembersPerLevel * (cardWidth + spacingX) - levelWidth) / 2;
+            
+            const x = startX + indexInLevel * (cardWidth + spacingX);
+            const y = level * (cardHeight + spacingY) + spacingY;
+            
+            // Create member card
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            card.style.cssText = `
+                position: absolute;
+                left: ${x}px;
+                top: ${y}px;
+                width: ${cardWidth}px;
+                height: ${cardHeight}px;
+                background: white;
+                border: 2px solid ${member.gender === 'Male' ? '#4A90E2' : '#E24A90'};
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                cursor: pointer;
+                transition: transform 0.2s;
+                z-index: 10;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            `;
+        
+            // Build card content dynamically to avoid empty lines
+            let cardContent = `
+                <div style="text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-weight: bold; font-size: 15px; margin-bottom: 6px; color: #2c3e50; line-height: 1.2;">
+                            ${member.full_name || 'Unknown Name'}
+                        </div>`;
+            
+            // Add Chinese name with new color
+            if (member.chinese_name && member.chinese_name !== 'undefined' && member.chinese_name.trim() !== '') {
+                cardContent += `<div style="font-size: 12px; color: #8B4513; margin-bottom: 4px; font-style: italic;">${member.chinese_name}</div>`;
+            }
+            
+            // Add nickname
+            if (member.nickname && member.nickname !== 'undefined' && member.nickname.trim() !== '') {
+                cardContent += `<div style="font-size: 11px; color: #059669; margin-bottom: 4px;">${member.nickname}</div>`;
+            }
+            
+            cardContent += `</div><div style="margin-top: auto;">`;
+            
+            // Add gender and status
+            cardContent += `<div style="font-size: 11px; color: #95a5a6; margin-bottom: 3px;">${member.gender || 'Unknown'} • ${member.current_status || 'Unknown'}</div>`;
+            
+            // Add birth date
+            if (member.birth_date && member.birth_date !== 'undefined' && member.birth_date.trim() !== '') {
+                cardContent += `<div style="font-size: 10px; color: #bdc3c7; margin-bottom: 2px;">Born: ${member.birth_date}</div>`;
+            }
+            
+            // Add death date
+            if (member.death_date && member.death_date !== 'undefined' && member.death_date.trim() !== '') {
+                cardContent += `<div style="font-size: 10px; color: #bdc3c7;">Died: ${member.death_date}</div>`;
+            }
+            
+            cardContent += `</div></div>`;
+            
+            card.innerHTML = cardContent;
+        
+            // Add click handler
+            card.addEventListener('click', () => showMemberDetails(member));
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'scale(1.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+            
+            container.appendChild(card);
+            
+            // Store position for connections
+            member.x = x + cardWidth / 2;
+            member.y = y + cardHeight / 2;
+            
+            memberIndex++;
+        });
+    });
+    
+    // Draw traditional family tree connections with correct positioning
+    // Find parents (top level) and children (bottom level)
+    const parents = [];
+    const children = [];
+    
+    // Group members by level
+    memberLevels.forEach((levelMembers, level) => {
+        if (level === 0) {
+            // Top level - parents
+            parents.push(...levelMembers);
+        } else if (level === 1) {
+            // Bottom level - children
+            children.push(...levelMembers);
+        }
+    });
+    
+    if (parents.length > 0 && children.length > 0) {
+        // Sort parents and children by x position
+        parents.sort((a, b) => a.x - b.x);
+        children.sort((a, b) => a.x - b.x);
+        
+        // Calculate positions - use actual card positions
+        const parentCenterY = parents[0].y;
+        const childCenterY = children[0].y;
+        
+        // 1. Draw horizontal line connecting parents (in the middle of the parent cards)
+        if (parents.length > 1) {
+            const leftParent = parents[0];
+            const rightParent = parents[parents.length - 1];
+            
+            const parentHorizontalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            parentHorizontalLine.setAttribute('x1', leftParent.x - cardWidth / 2); // Left edge of left parent
+            parentHorizontalLine.setAttribute('y1', parentCenterY); // Middle of parent cards
+            parentHorizontalLine.setAttribute('x2', rightParent.x + cardWidth / 2); // Right edge of right parent
+            parentHorizontalLine.setAttribute('y2', parentCenterY); // Middle of parent cards
+            parentHorizontalLine.style.stroke = '#74c0fc';
+            parentHorizontalLine.style.strokeWidth = '2px';
+            parentHorizontalLine.style.strokeLinecap = 'round';
+            svg.appendChild(parentHorizontalLine);
+        }
+        
+        // 2. Draw vertical line from center of parent horizontal line down to children level
+        const parentCenterX = parents.reduce((sum, p) => sum + p.x, 0) / parents.length;
+        const childCenterX = children.reduce((sum, c) => sum + c.x, 0) / children.length;
+        
+        const mainVerticalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        mainVerticalLine.setAttribute('x1', parentCenterX);
+        mainVerticalLine.setAttribute('y1', parentCenterY); // From middle of parent cards
+        mainVerticalLine.setAttribute('x2', childCenterX);
+        mainVerticalLine.setAttribute('y2', childCenterY - cardHeight / 2 - 20); // To children horizontal line
+        mainVerticalLine.style.stroke = '#74c0fc';
+        mainVerticalLine.style.strokeWidth = '2px';
+        mainVerticalLine.style.strokeLinecap = 'round';
+        svg.appendChild(mainVerticalLine);
+        
+        // 3. Draw horizontal line at children level (connecting between children cards)
+        if (children.length > 1) {
+            const leftChild = children[0];
+            const rightChild = children[children.length - 1];
+            
+            const childHorizontalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            childHorizontalLine.setAttribute('x1', leftChild.x); // Center of left child
+            childHorizontalLine.setAttribute('y1', childCenterY - cardHeight / 2 - 20); // Above children cards
+            childHorizontalLine.setAttribute('x2', rightChild.x); // Center of right child
+            childHorizontalLine.setAttribute('y2', childCenterY - cardHeight / 2 - 20); // Above children cards
+            childHorizontalLine.style.stroke = '#74c0fc';
+            childHorizontalLine.style.strokeWidth = '2px';
+            childHorizontalLine.style.strokeLinecap = 'round';
+            svg.appendChild(childHorizontalLine);
+        }
+        
+        // 4. Draw vertical lines from children horizontal line to each child (to top center of each child's card)
+        children.forEach(child => {
+            const childVerticalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            childVerticalLine.setAttribute('x1', child.x); // Center of child card
+            childVerticalLine.setAttribute('y1', childCenterY - cardHeight / 2 - 20); // From horizontal line
+            childVerticalLine.setAttribute('x2', child.x); // Center of child card
+            childVerticalLine.setAttribute('y2', child.y - cardHeight / 2); // To top center of child card
+            childVerticalLine.style.stroke = '#74c0fc';
+            childVerticalLine.style.strokeWidth = '2px';
+            childVerticalLine.style.strokeLinecap = 'round';
+            svg.appendChild(childVerticalLine);
+        });
+    }
+    
+    // Update container size based on level layout with proper margins
+    const totalWidth = maxMembersPerLevel * (cardWidth + spacingX) + spacingX + 40; // Add 40px margin
+    const totalHeight = totalLevels * (cardHeight + spacingY) + spacingY + 40; // Add 40px margin
+    
+    container.style.width = totalWidth + 'px';
+    container.style.height = totalHeight + 'px';
+    container.style.position = 'relative';
+    container.style.overflow = 'visible';
+    container.style.padding = '20px';
+    container.style.boxSizing = 'border-box';
+    
+    // Update SVG size to match container
+    svg.setAttribute('width', totalWidth + 'px');
+    svg.setAttribute('height', totalHeight + 'px');
+    
+    console.log(`Rendered ${treeData.members.length} members in ${totalLevels} levels with max ${maxMembersPerLevel} members per level`);
+}
+
+function showMemberDetails(member) {
+    console.log('Showing details for member:', member);
+    
+    const modalBody = document.getElementById('memberModalBody');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Basic Information</h6>
+                <p><strong>Full Name:</strong> ${member.name}</p>
+                ${member.chinese_name ? `<p><strong>Chinese Name:</strong> ${member.chinese_name}</p>` : ''}
+                ${member.nickname ? `<p><strong>Nickname:</strong> ${member.nickname}</p>` : ''}
+                <p><strong>Gender:</strong> ${member.gender}</p>
+                <p><strong>Status:</strong> ${member.is_alive ? 'Living' : 'Deceased'}</p>
+            </div>
+            <div class="col-md-6">
+                <h6>Dates</h6>
+                ${member.birth_date ? `<p><strong>Birth Date:</strong> ${member.birth_date}</p>` : ''}
+                ${member.death_date ? `<p><strong>Death Date:</strong> ${member.death_date}</p>` : ''}
+            </div>
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('memberModal'));
+    modal.show();
+}
+
+function zoomIn() {
+    currentZoom = Math.min(currentZoom * 1.2, 3);
+    applyZoom();
+}
+
+function zoomOut() {
+    currentZoom = Math.max(currentZoom / 1.2, 0.3);
+    applyZoom();
+}
+
+function resetZoom() {
+    currentZoom = 1;
+    applyZoom();
+}
+
+function applyZoom() {
+    const container = document.getElementById('familyTree');
+    container.style.transform = `scale(${currentZoom})`;
+    container.style.transformOrigin = 'top left';
+}
+
+function printTree() {
+    window.print();
+}
+
+// Language translation
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof translatePage === 'function') {
+        translatePage();
+    }
+});
+</script>
+
+<style>
+#familyTree {
+    position: relative;
+    overflow: visible;
+    min-height: 500px;
+    width: 100%;
+    height: 100%;
+}
+
+        .member-card {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+.member-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+}
+
+#familyTreeContainer {
+    overflow: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    min-height: 500px;
+    max-height: 600px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media print {
+    .card-header, .btn {
+        display: none !important;
+    }
+    
+    .member-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    #familyTreeContainer {
+        overflow: visible;
+        max-height: none;
+    }
+}
+</style>
+
+{% endblock %}

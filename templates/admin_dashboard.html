@@ -1,0 +1,997 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+            <div>
+                <a href="{{ url_for('family_tree') }}" class="btn btn-info">
+                    <i class="fas fa-sitemap"></i> View Family Tree
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Modern Statistics Cards -->
+        <div class="row mb-5 g-4">
+            <div class="col-md-3">
+                <div class="stats-card fade-in-up">
+                    <div class="stats-icon" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stats-number">{{ members|length }}</div>
+                    <div class="stats-label" data-translate="total-members">Total Members</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="stats-icon" style="background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stats-number">{{ members|selectattr('is_alive')|list|length }}</div>
+                    <div class="stats-label" data-translate="living-members">Living Members</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="stats-icon" style="background: linear-gradient(135deg, var(--info-color) 0%, #0891b2 100%);">
+                        <i class="fas fa-cross"></i>
+                    </div>
+                    <div class="stats-number">{{ members|rejectattr('is_alive')|list|length }}</div>
+                    <div class="stats-label" data-translate="deceased-members">Deceased Members</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="stats-icon" style="background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="stats-number">{{ members|selectattr('birth_date')|list|length }}</div>
+                    <div class="stats-label" data-translate="with-birth-dates">With Birth Dates</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Family Members Table -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list"></i> Family Members Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Chinese Name</th>
+                                <th>Nickname</th>
+                                <th>Gender</th>
+                                <th>Birth Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">#{{ member.id }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ member.full_name }}</strong>
+                                    {% if member.photo_filename %}
+                                        <br><img src="/uploads/{{ member.photo_filename }}" alt="Photo" class="img-thumbnail" style="width: 30px; height: 30px; object-fit: cover;">
+                                    {% endif %}
+                                </td>
+                                <td>{{ member.chinese_name or '-' }}</td>
+                                <td>{{ member.nickname or '-' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if member.gender == 'Male' else 'danger' }}">
+                                        {{ member.gender }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if member.birth_date %}
+                                        {{ member.birth_date.strftime('%B %d, %Y') }}
+                                    {% else %}
+                                        <span class="text-muted">Unknown</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if member.is_alive else 'secondary' }}">
+                                        {{ 'Living' if member.is_alive else 'Deceased' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editMember({{ member.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info" onclick="viewMember({{ member.id }})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteMember({{ member.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-tools"></i> Quick Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="addRelationship()">
+                                <i class="fas fa-link"></i> Add Family Relationship
+                            </button>
+                            <button class="btn btn-outline-success" onclick="exportData()">
+                                <i class="fas fa-download"></i> Export Family Data
+                            </button>
+                            <button class="btn btn-outline-info" onclick="generateReport()">
+                                <i class="fas fa-chart-bar"></i> Generate Family Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-cog"></i> System Management</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-warning" onclick="backupData()">
+                                <i class="fas fa-database"></i> Backup Database
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="validateData()">
+                                <i class="fas fa-check-circle"></i> Validate Data
+                            </button>
+                            <button class="btn btn-outline-dark" onclick="printTree()">
+                                <i class="fas fa-print"></i> Print Family Tree
+                            </button>
+                            <button class="btn btn-outline-success" onclick="exportGEDCOM()">
+                                <i class="fas fa-download"></i> Export GEDCOM
+                            </button>
+                            <button class="btn btn-outline-info" onclick="convertChildrenToMembers()">
+                                <i class="fas fa-users"></i> Convert Children to Members
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="convertSpousesToMembers()">
+                                <i class="fas fa-heart"></i> Convert Spouses to Members
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Member Edit Modal -->
+<div class="modal fade" id="editMemberModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Family Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editMemberForm">
+                    <input type="hidden" id="edit_member_id" name="id">
+                    <div class="mb-3">
+                        <label for="edit_full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="edit_full_name" name="full_name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_chinese_name" class="form-label">Chinese Name</label>
+                                <input type="text" class="form-control" id="edit_chinese_name" name="chinese_name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_nickname" class="form-label">Nickname</label>
+                                <input type="text" class="form-control" id="edit_nickname" name="nickname">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_gender" class="form-label">Gender</label>
+                                <select class="form-select" id="edit_gender" name="gender" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_is_alive" class="form-label">Status</label>
+                                <select class="form-select" id="edit_is_alive" name="is_alive">
+                                    <option value="true">Living</option>
+                                    <option value="false">Deceased</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_birth_date" class="form-label">Birth Date</label>
+                                <input type="date" class="form-control" id="edit_birth_date" name="birth_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_death_date" class="form-label">Death Date</label>
+                                <input type="date" class="form-control" id="edit_death_date" name="death_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_birth_place" class="form-label">Birth Place</label>
+                                <input type="text" class="form-control" id="edit_birth_place" name="birth_place">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_death_place" class="form-label">Death Place</label>
+                                <input type="text" class="form-control" id="edit_death_place" name="death_place">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_marital_status" class="form-label">Marital Status</label>
+                                <select class="form-select" id="edit_marital_status" name="marital_status">
+                                    <option value="">Select Status</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_spouse_name" class="form-label">Spouse Name</label>
+                                <input type="text" class="form-control" id="edit_spouse_name" name="spouse_name">
+                                <div id="edit_spouse_suggestions" class="suggestions-container" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_father_name" class="form-label">Father's Name</label>
+                                <input type="text" class="form-control" id="edit_father_name" name="father_name">
+                                <div id="edit_father_suggestions" class="suggestions-container" style="display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_mother_name" class="form-label">Mother's Name</label>
+                                <input type="text" class="form-control" id="edit_mother_name" name="mother_name">
+                                <div id="edit_mother_suggestions" class="suggestions-container" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="edit_notes" name="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveMember()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Member View Modal -->
+<div class="modal fade" id="viewMemberModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Family Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <img id="view_photo" src="" alt="Member Photo" class="img-fluid rounded mb-3" style="max-height: 200px; display: none;">
+                        <div id="no_photo" class="text-muted">
+                            <i class="fas fa-user-circle fa-5x"></i>
+                            <p>No photo available</p>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Member ID:</strong>
+                                <p id="view_member_id">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Full Name:</strong>
+                                <p id="view_full_name">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Chinese Name:</strong>
+                                <p id="view_chinese_name">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Nickname:</strong>
+                                <p id="view_nickname">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Gender:</strong>
+                                <p id="view_gender">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Status:</strong>
+                                <p id="view_status">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Marital Status:</strong>
+                                <p id="view_marital_status">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Birth Date:</strong>
+                                <p id="view_birth_date">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Death Date:</strong>
+                                <p id="view_death_date">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Birth Place:</strong>
+                                <p id="view_birth_place">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Death Place:</strong>
+                                <p id="view_death_place">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Spouse Name:</strong>
+                                <p id="view_spouse_name">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Father's Name:</strong>
+                                <p id="view_father_name">-</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Mother's Name:</strong>
+                                <p id="view_mother_name">-</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <strong>Notes:</strong>
+                                <p id="view_notes">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentMemberId = null;
+
+function editMember(memberId) {
+    currentMemberId = memberId;
+    
+    // Fetch member data
+    fetch(`/api/get-member/${memberId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Populate form fields
+            document.getElementById('edit_member_id').value = data.id;
+            document.getElementById('edit_full_name').value = data.full_name || '';
+            document.getElementById('edit_chinese_name').value = data.chinese_name || '';
+            document.getElementById('edit_nickname').value = data.nickname || '';
+            document.getElementById('edit_gender').value = data.gender || '';
+            document.getElementById('edit_is_alive').value = data.is_alive ? 'true' : 'false';
+            document.getElementById('edit_birth_date').value = data.birth_date || '';
+            document.getElementById('edit_death_date').value = data.death_date || '';
+            document.getElementById('edit_birth_place').value = data.birth_place || '';
+            document.getElementById('edit_death_place').value = data.death_place || '';
+            document.getElementById('edit_marital_status').value = data.marital_status || '';
+            document.getElementById('edit_spouse_name').value = data.spouse_name || '';
+            document.getElementById('edit_father_name').value = data.father_name || '';
+            document.getElementById('edit_mother_name').value = data.mother_name || '';
+            document.getElementById('edit_notes').value = data.notes || '';
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('editMemberModal'));
+            modal.show();
+            
+            // Add event listeners for relationship detection
+            setupRelationshipListenersAdmin();
+        })
+        .catch(error => {
+            console.error('Error fetching member data:', error);
+            alert('Error loading member data');
+        });
+}
+
+function viewMember(memberId) {
+    // Fetch member data and show in a view modal
+    fetch(`/api/get-member/${memberId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Populate the view modal
+            document.getElementById('view_member_id').textContent = `#${data.id}`;
+            document.getElementById('view_full_name').textContent = data.full_name || 'N/A';
+            document.getElementById('view_chinese_name').textContent = data.chinese_name || 'N/A';
+            document.getElementById('view_nickname').textContent = data.nickname || 'N/A';
+            document.getElementById('view_gender').textContent = data.gender || 'N/A';
+            document.getElementById('view_status').textContent = data.is_alive ? 'Living' : 'Deceased';
+            document.getElementById('view_birth_date').textContent = data.birth_date || 'N/A';
+            document.getElementById('view_death_date').textContent = data.death_date || 'N/A';
+            document.getElementById('view_birth_place').textContent = data.birth_place || 'N/A';
+            document.getElementById('view_death_place').textContent = data.death_place || 'N/A';
+            document.getElementById('view_marital_status').textContent = data.marital_status || 'N/A';
+            document.getElementById('view_spouse_name').textContent = data.spouse_name || 'N/A';
+            document.getElementById('view_father_name').textContent = data.father_name || 'N/A';
+            document.getElementById('view_mother_name').textContent = data.mother_name || 'N/A';
+            document.getElementById('view_notes').textContent = data.notes || 'N/A';
+            
+            // Show photo if available
+            const photoElement = document.getElementById('view_photo');
+            if (data.photo_filename) {
+                photoElement.src = `/uploads/${data.photo_filename}`;
+                photoElement.style.display = 'block';
+            } else {
+                photoElement.style.display = 'none';
+            }
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('viewMemberModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error fetching member data:', error);
+            alert('Error loading member data');
+        });
+}
+
+function deleteMember(memberId) {
+    if (confirm('Are you sure you want to delete this family member? This action cannot be undone.')) {
+        fetch(`/api/delete-member/${memberId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Family member deleted successfully');
+                location.reload(); // Refresh the page to update the table
+            } else {
+                alert('Error deleting member: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting member:', error);
+            alert('Error deleting member');
+        });
+    }
+}
+
+function saveMember() {
+    if (!currentMemberId) {
+        alert('No member selected for editing');
+        return;
+    }
+    
+    // Collect form data
+    const formData = new FormData();
+    formData.append('full_name', document.getElementById('edit_full_name').value);
+    formData.append('chinese_name', document.getElementById('edit_chinese_name').value);
+    formData.append('nickname', document.getElementById('edit_nickname').value);
+    formData.append('gender', document.getElementById('edit_gender').value);
+    formData.append('is_alive', document.getElementById('edit_is_alive').value);
+    formData.append('birth_date', document.getElementById('edit_birth_date').value);
+    formData.append('death_date', document.getElementById('edit_death_date').value);
+    formData.append('birth_place', document.getElementById('edit_birth_place').value);
+    formData.append('death_place', document.getElementById('edit_death_place').value);
+    formData.append('marital_status', document.getElementById('edit_marital_status').value);
+    formData.append('spouse_name', document.getElementById('edit_spouse_name').value);
+    formData.append('father_name', document.getElementById('edit_father_name').value);
+    formData.append('mother_name', document.getElementById('edit_mother_name').value);
+    formData.append('notes', document.getElementById('edit_notes').value);
+    
+    // Send update request
+    fetch(`/api/update-member/${currentMemberId}`, {
+        method: 'PUT',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Family member updated successfully');
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editMemberModal'));
+            modal.hide();
+            // Refresh the page to update the table
+            location.reload();
+        } else {
+            alert('Error updating member: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating member:', error);
+        alert('Error updating member');
+    });
+}
+
+function addRelationship() {
+    // Open family tree page for relationship management
+    window.open('/family-tree', '_blank');
+}
+
+function exportData() {
+    // Export family data as JSON
+    fetch('/api/get-members')
+        .then(response => response.json())
+        .then(data => {
+            const exportData = {
+                export_date: new Date().toISOString(),
+                family_members: data,
+                total_members: data.length
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `family_tree_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Family data exported successfully!');
+        })
+        .catch(error => {
+            console.error('Export error:', error);
+            alert('Error exporting data. Please try again.');
+        });
+}
+
+function generateReport() {
+    // Generate a family statistics report
+    fetch('/api/get-members')
+        .then(response => response.json())
+        .then(data => {
+            const livingMembers = data.filter(member => member.is_alive).length;
+            const deceasedMembers = data.filter(member => !member.is_alive).length;
+            const maleMembers = data.filter(member => member.gender === 'Male').length;
+            const femaleMembers = data.filter(member => member.gender === 'Female').length;
+            const marriedMembers = data.filter(member => member.marital_status === 'Married').length;
+            const singleMembers = data.filter(member => member.marital_status === 'Single').length;
+            
+            const report = `
+TU SANG FAMILY TREE REPORT
+Generated: ${new Date().toLocaleDateString()}
+
+FAMILY STATISTICS:
+==================
+Total Family Members: ${data.length}
+Living Members: ${livingMembers}
+Deceased Members: ${deceasedMembers}
+
+GENDER DISTRIBUTION:
+===================
+Male: ${maleMembers}
+Female: ${femaleMembers}
+
+MARITAL STATUS:
+===============
+Married: ${marriedMembers}
+Single: ${singleMembers}
+
+RECENT ADDITIONS:
+================
+${data.slice(-5).map(member => `- ${member.full_name} (${member.created_at ? new Date(member.created_at).toLocaleDateString() : 'Unknown'})`).join('\n')}
+
+This report was generated automatically by the TU SANG Family Tree system.
+            `;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `family_report_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Family report generated successfully!');
+        })
+        .catch(error => {
+            console.error('Report generation error:', error);
+            alert('Error generating report. Please try again.');
+        });
+}
+
+function backupData() {
+    // Create a comprehensive backup of all data
+    Promise.all([
+        fetch('/api/get-members').then(r => r.json()),
+        // Add more API calls if you have relationships, etc.
+    ])
+    .then(([members]) => {
+        const backup = {
+            backup_date: new Date().toISOString(),
+            version: '1.0',
+            family_members: members,
+            metadata: {
+                total_members: members.length,
+                backup_type: 'full_backup'
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `family_backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert('Database backup created successfully!');
+    })
+    .catch(error => {
+        console.error('Backup error:', error);
+        alert('Error creating backup. Please try again.');
+    });
+}
+
+function validateData() {
+    // Validate family data for inconsistencies
+    fetch('/api/get-members')
+        .then(response => response.json())
+        .then(data => {
+            const issues = [];
+            
+            // Check for missing required fields
+            data.forEach(member => {
+                if (!member.full_name || member.full_name.trim() === '') {
+                    issues.push(`Member ID ${member.id}: Missing full name`);
+                }
+                if (!member.gender) {
+                    issues.push(`Member ID ${member.id}: Missing gender`);
+                }
+                if (member.marital_status === 'Married' && !member.spouse_name) {
+                    issues.push(`Member ID ${member.id}: Married but no spouse name`);
+                }
+                if (member.marital_status === 'Single' && (!member.father_name || !member.mother_name)) {
+                    issues.push(`Member ID ${member.id}: Single but missing parent names`);
+                }
+            });
+            
+            // Check for duplicate names
+            const names = data.map(m => m.full_name.toLowerCase());
+            const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+            if (duplicates.length > 0) {
+                issues.push(`Duplicate names found: ${[...new Set(duplicates)].join(', ')}`);
+            }
+            
+            if (issues.length === 0) {
+                alert('✅ Data validation passed! No issues found.');
+            } else {
+                const report = `Data Validation Report:\n\nIssues Found (${issues.length}):\n${issues.join('\n')}`;
+                alert(report);
+            }
+        })
+        .catch(error => {
+            console.error('Validation error:', error);
+            alert('Error validating data. Please try again.');
+        });
+}
+
+function printTree() {
+    window.open('/family-tree', '_blank');
+}
+
+function exportGEDCOM() {
+    // Create a link to download the GEDCOM file
+    const link = document.createElement('a');
+    link.href = '/api/export-gedcom';
+    link.download = 'family_tree.ged';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Show success message
+    alert('GEDCOM file exported successfully! The file "family_tree.ged" has been downloaded.');
+}
+
+function convertChildrenToMembers() {
+    if (confirm('This will convert all children data stored in the children_data field to separate family member records. This action cannot be undone. Continue?')) {
+        fetch('/api/convert-children-to-members', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Success! Converted ${data.converted_count} children to separate family members. New member IDs: ${data.new_member_ids.join(', ')}`);
+                // Refresh the page to show updated data
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error converting children to members: ' + error.message);
+        });
+    }
+}
+
+function convertSpousesToMembers() {
+    if (confirm('This will convert all spouse names stored in the spouse_name field to separate family member records. This action cannot be undone. Continue?')) {
+        fetch('/api/convert-spouses-to-members', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Success! Converted ${data.converted_count} spouses to separate family members. New member IDs: ${data.new_member_ids.join(', ')}`);
+                // Refresh the page to show updated data
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error converting spouses to members: ' + error.message);
+        });
+    }
+}
+
+// Relationship detection functions for admin edit form
+function checkExistingNamesAdmin(fieldName, inputValue) {
+    if (!inputValue || inputValue.length < 2) {
+        hideSuggestionsAdmin(fieldName);
+        return;
+    }
+    
+    fetch('/api/check-existing-names', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: inputValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.matches.length > 0) {
+            showNameSuggestionsAdmin(fieldName, data.matches);
+        } else {
+            hideSuggestionsAdmin(fieldName);
+        }
+    })
+    .catch(error => {
+        console.error('Error checking names:', error);
+        hideSuggestionsAdmin(fieldName);
+    });
+}
+
+function showNameSuggestionsAdmin(fieldName, matches) {
+    const suggestionsContainer = document.getElementById(`edit_${fieldName}_suggestions`);
+    if (!suggestionsContainer) return;
+    
+    suggestionsContainer.innerHTML = '';
+    suggestionsContainer.style.display = 'block';
+    
+    const suggestionsTitle = document.createElement('div');
+    suggestionsTitle.className = 'suggestions-title';
+    suggestionsTitle.textContent = 'Found existing family members:';
+    suggestionsContainer.appendChild(suggestionsTitle);
+    
+    matches.forEach(match => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.className = 'suggestion-item';
+        suggestionItem.innerHTML = `
+            <div class="suggestion-name">${match.full_name}</div>
+            <div class="suggestion-details">
+                ${match.chinese_name ? `Chinese: ${match.chinese_name}` : ''}
+                ${match.nickname ? `Nickname: ${match.nickname}` : ''}
+                ${match.gender ? `Gender: ${match.gender}` : ''}
+            </div>
+        `;
+        
+        suggestionItem.addEventListener('click', () => {
+            useExistingNameAdmin(fieldName, match);
+        });
+        
+        suggestionsContainer.appendChild(suggestionItem);
+    });
+}
+
+function useExistingNameAdmin(fieldName, member) {
+    const inputField = document.getElementById(`edit_${fieldName}`);
+    inputField.value = member.full_name;
+    hideSuggestionsAdmin(fieldName);
+    
+    // Store the member data for relationship creation
+    inputField.dataset.memberId = member.id;
+    inputField.dataset.memberData = JSON.stringify(member);
+    
+    // Show relationship suggestion
+    suggestRelationshipAdmin(fieldName, member);
+}
+
+function suggestRelationshipAdmin(fieldName, member) {
+    const relationshipType = getRelationshipTypeAdmin(fieldName);
+    const currentMemberId = document.getElementById('edit_member_id').value;
+    
+    if (!currentMemberId || !member.id) return;
+    
+    showRelationshipConfirmationAdmin(fieldName, member, relationshipType);
+}
+
+function getRelationshipTypeAdmin(fieldName) {
+    switch(fieldName) {
+        case 'father_name': return 'parent';
+        case 'mother_name': return 'parent';
+        case 'spouse_name': return 'spouse';
+        default: return 'parent';
+    }
+}
+
+function showRelationshipConfirmationAdmin(fieldName, member, relationshipType) {
+    const suggestionsContainer = document.getElementById(`edit_${fieldName}_suggestions`);
+    if (!suggestionsContainer) return;
+    
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'relationship-confirmation';
+    confirmationDiv.innerHTML = `
+        <div class="confirmation-message">
+            <strong>Create relationship?</strong><br>
+            ${member.full_name} as ${relationshipType === 'parent' ? 'parent' : 'spouse'}
+        </div>
+        <div class="confirmation-buttons">
+            <button type="button" class="btn btn-sm btn-success" onclick="confirmRelationshipAdmin('${fieldName}', ${member.id}, '${relationshipType}')">
+                Yes, Create Relationship
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="cancelRelationshipAdmin('${fieldName}')">
+                No, Just Use Name
+            </button>
+        </div>
+    `;
+    
+    suggestionsContainer.appendChild(confirmationDiv);
+}
+
+function confirmRelationshipAdmin(fieldName, memberId, relationshipType) {
+    const currentMemberId = document.getElementById('edit_member_id').value;
+    
+    if (!currentMemberId || !memberId) return;
+    
+    fetch('/api/create-relationship', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            person1_id: currentMemberId,
+            person2_id: memberId,
+            relationship_type: relationshipType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Relationship created successfully! ${relationshipType === 'parent' ? 'Parent-child' : 'Spouse'} relationship established.`);
+        } else {
+            alert('Error creating relationship: ' + data.message);
+        }
+        hideSuggestionsAdmin(fieldName);
+    })
+    .catch(error => {
+        console.error('Error creating relationship:', error);
+        alert('Error creating relationship');
+        hideSuggestionsAdmin(fieldName);
+    });
+}
+
+function cancelRelationshipAdmin(fieldName) {
+    hideSuggestionsAdmin(fieldName);
+}
+
+function hideSuggestionsAdmin(fieldName) {
+    const suggestionsContainer = document.getElementById(`edit_${fieldName}_suggestions`);
+    if (suggestionsContainer) {
+        suggestionsContainer.style.display = 'none';
+        suggestionsContainer.innerHTML = '';
+    }
+}
+
+function setupRelationshipListenersAdmin() {
+    // Add event listeners for father name
+    const fatherInput = document.getElementById('edit_father_name');
+    if (fatherInput) {
+        fatherInput.addEventListener('input', function() {
+            checkExistingNamesAdmin('father_name', this.value);
+        });
+        fatherInput.addEventListener('blur', function() {
+            setTimeout(() => hideSuggestionsAdmin('father_name'), 200);
+        });
+    }
+    
+    // Add event listeners for mother name
+    const motherInput = document.getElementById('edit_mother_name');
+    if (motherInput) {
+        motherInput.addEventListener('input', function() {
+            checkExistingNamesAdmin('mother_name', this.value);
+        });
+        motherInput.addEventListener('blur', function() {
+            setTimeout(() => hideSuggestionsAdmin('mother_name'), 200);
+        });
+    }
+    
+    // Add event listeners for spouse name
+    const spouseInput = document.getElementById('edit_spouse_name');
+    if (spouseInput) {
+        spouseInput.addEventListener('input', function() {
+            checkExistingNamesAdmin('spouse_name', this.value);
+        });
+        spouseInput.addEventListener('blur', function() {
+            setTimeout(() => hideSuggestionsAdmin('spouse_name'), 200);
+        });
+    }
+}
+</script>
+{% endblock %}

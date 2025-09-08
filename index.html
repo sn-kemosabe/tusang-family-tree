@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TU SANG Family Tree</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --card-bg: #ffffff;
+            --card-border: rgba(0, 0, 0, 0.1);
+            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.15), 0 20px 40px rgba(0, 0, 0, 0.1);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            position: relative;
+            color: var(--text-primary);
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            padding: 2.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .glass-header {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .glass-header h1 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .form-section h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-group label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .radio-item:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .radio-item input[type="radio"] {
+            width: auto;
+            margin-right: 0.75rem;
+            accent-color: #667eea;
+        }
+        
+        .radio-item input[type="radio"]:checked + span {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--text-primary);
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger-gradient);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(250, 112, 154, 0.3);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            margin: auto;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: var(--shadow-hover);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close-button {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-button:hover {
+            color: #667eea;
+        }
+        
+        .member-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+        
+        .member-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .member-photo {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .member-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .member-info strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Chinese Stroke Input Styles */
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        .suggestion-chars {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .suggestion-char {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .suggestion-char:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+            
+            .glass-header h1 {
+                font-size: 2rem;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .btn-primary {
+                padding: 0.875rem 1.5rem;
+            }
+            
+            /* Mobile-specific stroke input styles */
+            
+            
+            
+            
+            .suggestion-chars {
+                justify-content: center;
+            }
+            
+            .suggestion-char {
+                padding: 0.75rem 1rem;
+                font-size: 1.4rem;
+                min-width: 50px;
+                text-align: center;
+            }
+            
+        }
+        
+        @media (max-width: 480px) {
+            .glass-header h1 {
+                font-size: 1.5rem;
+                line-height: 1.3;
+            }
+            
+            
+            
+            
+            
+            .suggestion-char {
+                padding: 0.6rem 0.8rem;
+                font-size: 1.2rem;
+                min-width: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="fixed inset-0 bg-gray-200 dark:bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="loading-spinner"></div>
+        <p class="ml-4 text-gray-700 dark:text-gray-300 font-medium">Memulakan...</p>
+    </div>
+
+    <div id="app" class="container mx-auto space-y-8 hidden fade-in">
+        <header class="glass-header">
+            <h1>TU SANG(土生) & TAI DI(帶娣)<br>BIG FAMILY TREE PROJECT</h1>
+            <p class="text-gray-600 text-lg">Preserving Our Family Legacy</p>
+        </header>
+
+        <!-- Form for Data Input -->
+        <div class="card">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Tambah Ahli Keluarga</h2>
+                <p class="text-red-500 font-medium">Sila isikan semua ruangan dengan tanda bintang (*)</p>
+            </div>
+            
+            <form id="memberForm" class="space-y-6">
+                <!-- Family Information Section -->
+                <div class="form-section">
+                    <h3>Maklumat Keluarga</h3>
+                    <div class="input-group">
+                        <label for="bigFamily">Nama Keluarga Besar <span class="text-red-500">*</span></label>
+                        <select id="bigFamily" required>
+                            <option value="">Pilih Keluarga Besar</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="smallFamily">Nama Keluarga Kecil <span class="text-red-500">*</span></label>
+                        <select id="smallFamily" required>
+                            <option value="">Pilih Keluarga Kecil</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <h3>Maklumat Peribadi</h3>
+                    <div class="input-group">
+                        <label for="name">Nama Penuh <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="chineseName">Nama dalam Tulisan Cina <i>(jika ada)</i></label>
+                        <input type="text" id="chineseName">
+                    </div>
+                    <div class="input-group">
+                        <label for="nickname">Nama Panggilan/Mesra</label>
+                        <input type="text" id="nickname">
+                    </div>
+                    <div class="input-group">
+                        <label>Jantina</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="gender" value="Lelaki">
+                                <span>Lelaki</span>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="gender" value="Perempuan">
+                                <span>Perempuan</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="birthday">Tarikh Lahir <span class="text-red-500">*</span></label>
+                        <input type="date" id="birthday" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Status Semasa <span class="text-red-500">*</span></label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="status" value="Hidup" required>
+                                <span>Hidup</span>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="status" value="Meninggal" required>
+                                <span>Meninggal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dateOfDeathContainer" class="input-group hidden">
+                        <label for="dateOfDeath">Tarikh Meninggal <span class="text-red-500">*</span></label>
+                        <input type="date" id="dateOfDeath">
+                    </div>
+                    <div class="input-group">
+                        <label for="photo">Gambar</label>
+                        <input type="file" id="photo" accept="image/*">
+                        <p class="text-sm text-gray-500 mt-1">Saiz fail maksimum: 5MB.</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="maritalStatus">Status Perkahwinan</label>
+                        <select id="maritalStatus">
+                            <option value="">Pilih Status</option>
+                            <option value="Bujang">Bujang</option>
+                            <option value="Berkahwin">Berkahwin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="form-section">
+                    <h3>Maklumat Tambahan</h3>
+                    <div class="input-group">
+                        <label for="birthPlace">Tempat Lahir</label>
+                        <input type="text" id="birthPlace" placeholder="Bandar, Negeri">
+                    </div>
+                    <div class="input-group">
+                        <label for="deathPlace">Tempat Meninggal <i>(jika ada)</i></label>
+                        <input type="text" id="deathPlace" placeholder="Bandar, Negeri">
+                    </div>
+                    <div class="input-group">
+                        <label for="occupation">Pekerjaan</label>
+                        <input type="text" id="occupation" placeholder="Contoh: Doktor, Guru, Peniaga">
+                    </div>
+                    <div class="input-group">
+                        <label for="education">Pendidikan</label>
+                        <input type="text" id="education" placeholder="Contoh: SPM, Diploma, Ijazah">
+                    </div>
+                    <div class="input-group">
+                        <label for="notes">Nota <i>(jika ada)</i></label>
+                        <textarea id="notes" rows="3" placeholder="Maklumat tambahan tentang ahli keluarga ini..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Family Relationships Section -->
+                <div class="form-section">
+                    <h3>Hubungan Keluarga</h3>
+                    <div class="input-group">
+                        <label for="parent1">Ibu/Bapa 1</label>
+                        <select id="parent1">
+                            <option value="">Pilih Ibu/Bapa 1</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="parent2">Ibu/Bapa 2</label>
+                        <select id="parent2">
+                            <option value="">Pilih Ibu/Bapa 2</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="spouse">Pasangan <i>(jika ada)</i></label>
+                        <select id="spouse">
+                            <option value="">Pilih Pasangan</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="siblings">Adik-Beradik <i>(jika ada)</i></label>
+                        <select id="siblings" multiple>
+                            <option value="">Pilih Adik-Beradik</option>
+                        </select>
+                        <p class="text-sm text-gray-500 mt-1">Tekan Ctrl (Windows) atau Cmd (Mac) untuk pilih berbilang.</p>
+                    </div>
+                </div>
+
+                <!-- Conditional fields for 'Bujang' status -->
+                <div id="singleStatusFields" class="form-section hidden">
+                    <h3>Maklumat Ibu Bapa</h3>
+                    <div class="input-group">
+                        <label for="fatherName">Nama Bapa</label>
+                        <input type="text" id="fatherName">
+                    </div>
+                    <div class="input-group">
+                        <label for="motherName">Nama Ibu</label>
+                        <input type="text" id="motherName">
+                    </div>
+                </div>
+
+                <!-- Conditional fields for 'Berkahwin' status -->
+                <div id="marriedStatusFields" class="form-section hidden">
+                    <h3>Maklumat Pasangan & Anak</h3>
+                    <div class="input-group">
+                        <label for="spouseName">Nama Suami/Isteri</label>
+                        <input type="text" id="spouseName">
+                    </div>
+                    <div class="input-group">
+                        <label>Mempunyai Anak</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" name="hasChildren" value="Ya">
+                                <span>Ya</span>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="hasChildren" value="Tidak">
+                                <span>Tidak</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conditional fields for 'Ya' hasChildren status -->
+                <div id="childrenContainer" class="form-section hidden">
+                    <h3>Butiran Anak</h3>
+                    <!-- Children forms will be added here dynamically -->
+                </div>
+                
+                <button type="button" id="addChildBtn" class="btn-success w-full hidden">Tambah Anak</button>
+                
+                <div class="input-group">
+                    <label for="notes">Nota <i>(jika ada)</i></label>
+                    <textarea id="notes" rows="3"></textarea>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="btn-primary w-full">
+                    Tambah Ahli Keluarga
+                </button>
+            </form>
+        </div>
+
+        <!-- Data Display and Download Section -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Ahli Keluarga yang telah dikumpul</h2>
+                <button id="downloadBtn" class="btn-secondary">
+                    📥 Muat turun Data (JSON)
+                </button>
+            </div>
+            
+            <!-- Search and Filter Section -->
+            <div class="form-section mb-6">
+                <h3>Cari & Tapis Ahli Keluarga</h3>
+                <div class="input-group">
+                    <label for="searchInput">Cari Ahli Keluarga</label>
+                    <input type="text" id="searchInput" placeholder="Masukkan nama, nama Cina, atau pekerjaan...">
+                </div>
+                <div class="flex flex-wrap gap-4 mt-4">
+                    <div class="input-group">
+                        <label for="filterStatus">Tapis mengikut Status</label>
+                        <select id="filterStatus">
+                            <option value="">Semua Status</option>
+                            <option value="Hidup">Hidup</option>
+                            <option value="Meninggal">Meninggal</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="filterGender">Tapis mengikut Jantina</label>
+                        <select id="filterGender">
+                            <option value="">Semua Jantina</option>
+                            <option value="Lelaki">Lelaki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="filterMaritalStatus">Tapis mengikut Status Perkahwinan</label>
+                        <select id="filterMaritalStatus">
+                            <option value="">Semua Status</option>
+                            <option value="Bujang">Bujang</option>
+                            <option value="Berkahwin">Berkahwin</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="clearFiltersBtn" class="btn-secondary mt-4">🗑️ Padamkan Penapis</button>
+            </div>
+            
+            <div id="membersList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Family member cards will be rendered here -->
+            </div>
+            <p id="noMembersMessage" class="text-center text-gray-500 text-lg py-8 hidden">Belum ada ahli keluarga yang ditambah.</p>
+        </div>
+
+        <!-- Message Modal -->
+        <div id="messageModal" class="modal hidden">
+            <div class="modal-content">
+                <span id="closeModalBtn" class="close-button">&times;</span>
+                <p id="modalMessage" class="text-center text-gray-700"></p>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirmModal" class="modal hidden">
+            <div class="modal-content text-center space-y-4">
+                <p class="text-gray-700 font-medium">Anda pasti ingin memadam ahli keluarga ini? Tindakan ini tidak boleh diundur.</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="confirmYesBtn" class="btn-danger">Ya, Padam</button>
+                    <button id="confirmNoBtn" class="btn-secondary">Tidak, Batal</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+ 
+    </script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase log level for debugging
+        setLogLevel('debug');
+
+        // Global variables for Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDB1GZLL_HcLikUPf92bd4MmsILufySVeQ",
+            authDomain: "tusang-family-tree.firebaseapp.com",
+            projectId: "tusang-family-tree",
+            storageBucket: "tusang-family-tree.firebasestorage.app",
+            messagingSenderId: "723264105049",
+            appId: "1:723264105049:web:12af89f50e321a8fcc9f48",
+            measurementId: "G-H9TJJKD7D1"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth;
+        let memberIdToDelete = null;
+
+        const familyData = {
+            'Chong Khiun Yin': ['Chong Kok On', 'Chong Kian Min', 'Chong Vun Hin'],
+            'Chong Yun Chin': ['Chong Ken Fong', 'Chong Ken Foo', 'Chong Tze Vun'],
+            'Kuku Tijah (Beaufort)': ['Lim Thien Vun', 'Lim Thien Yew'],
+            'Kuku Lien Kiau (Hong Kong)': ['Wong Hon Kiat', 'Wong Hon Vun'],
+            'Chong Tai Yin': ['Chong Kiat Sin', 'Chong Kiat Min'],
+            'Chong Kon Hee': ['Chong Vun Khin', 'Chong Vun Kit'],
+            'Chong Hen On': ['Chong Vun Khiun', 'Chong Vun Tze'],
+            'Chong Kon Chin': ['Chong Kiat Thin', 'Chong Ket Moi'],
+        };
+
+        const loadingScreen = document.getElementById('loading');
+        const appContainer = document.getElementById('app');
+        const memberForm = document.getElementById('memberForm');
+        const bigFamilySelect = document.getElementById('bigFamily');
+        const smallFamilySelect = document.getElementById('smallFamily');
+        const maritalStatusSelect = document.getElementById('maritalStatus');
+        const singleStatusFields = document.getElementById('singleStatusFields');
+        const marriedStatusFields = document.getElementById('marriedStatusFields');
+        const hasChildrenRadios = document.querySelectorAll('input[name="hasChildren"]');
+        const childrenContainer = document.getElementById('childrenContainer');
+        const addChildBtn = document.getElementById('addChildBtn');
+        const statusRadios = document.querySelectorAll('input[name="status"]');
+        const dateOfDeathContainer = document.getElementById('dateOfDeathContainer');
+        const membersList = document.getElementById('membersList');
+        const noMembersMessage = document.getElementById('noMembersMessage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const messageModal = document.getElementById('messageModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmYesBtn = document.getElementById('confirmYesBtn');
+        const confirmNoBtn = document.getElementById('confirmNoBtn');
+
+        const showMessage = (message) => {
+            modalMessage.textContent = message;
+            messageModal.classList.remove('hidden');
+        };
+
+        closeModalBtn.onclick = () => {
+            messageModal.classList.add('hidden');
+        };
+
+        confirmNoBtn.onclick = () => {
+            confirmModal.classList.add('hidden');
+            memberIdToDelete = null;
+        };
+
+        confirmYesBtn.onclick = async () => {
+            confirmModal.classList.add('hidden');
+            if (memberIdToDelete) {
+                try {
+                    // Always use local storage mode
+                    const localData = loadFromLocalStorage();
+                    const updatedData = localData.filter(member => member.id !== memberIdToDelete);
+                    if (saveToLocalStorage(updatedData)) {
+                        renderMembersWithFilters(updatedData);
+                        showMessage("Ahli keluarga berjaya dipadam!");
+                    } else {
+                        showMessage("Gagal memadam ahli keluarga. Sila cuba lagi.");
+                    }
+                } catch (e) {
+                    console.error("Error deleting document: ", e);
+                    showMessage("Gagal memadam ahli keluarga. Sila cuba lagi.");
+                } finally {
+                    memberIdToDelete = null;
+                }
+            }
+        };
+
+        window.onclick = (event) => {
+            if (event.target === messageModal) {
+                messageModal.classList.add('hidden');
+            }
+            if (event.target === confirmModal) {
+                confirmModal.classList.add('hidden');
+                memberIdToDelete = null;
+            }
+        };
+
+        const populateBigFamily = () => {
+            for (const family in familyData) {
+                const option = document.createElement('option');
+                option.value = family;
+                option.textContent = family;
+                bigFamilySelect.appendChild(option);
+            }
+        };
+
+        const populateSmallFamily = (selectedFamily) => {
+            smallFamilySelect.innerHTML = '<option value="">Pilih Keluarga Kecil</option>';
+            if (selectedFamily && familyData[selectedFamily]) {
+                familyData[selectedFamily].forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member;
+                    option.textContent = member;
+                    smallFamilySelect.appendChild(option);
+                });
+            }
+        };
+
+        const addChildForm = () => {
+            const childIndex = childrenContainer.querySelectorAll('.child-entry').length;
+            const childEntryDiv = document.createElement('div');
+            childEntryDiv.className = 'child-entry form-section mt-4';
+            childEntryDiv.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-lg font-semibold text-gray-800">👶 Anak #${childIndex + 1}</h4>
+                    <button type="button" class="remove-child-btn btn-danger text-sm">🗑️ Padam</button>
+                </div>
+                <div class="input-group">
+                    <label for="childFullName-${childIndex}">Nama Penuh</label>
+                    <input type="text" id="childFullName-${childIndex}">
+                </div>
+                <div class="input-group">
+                    <label for="childChineseName-${childIndex}">Nama dalam Tulisan Cina <i>(jika ada)</i></label>
+                    <input type="text" id="childChineseName-${childIndex}">
+                </div>
+                <div class="input-group">
+                    <label for="childNickname-${childIndex}">Nama Panggilan/Mesra</label>
+                    <input type="text" id="childNickname-${childIndex}">
+                </div>
+                <div class="input-group">
+                    <label for="childBirthday-${childIndex}">Tarikh Lahir</label>
+                    <input type="date" id="childBirthday-${childIndex}">
+                </div>
+                <div class="input-group">
+                    <label>Jantina</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="childGender-${childIndex}" value="Lelaki">
+                            <span>Lelaki</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="childGender-${childIndex}" value="Perempuan">
+                            <span>Perempuan</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Status Semasa</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" name="childStatus-${childIndex}" value="Hidup">
+                            <span>Hidup</span>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="childStatus-${childIndex}" value="Meninggal">
+                            <span>Meninggal</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="childDateOfDeathContainer-${childIndex}" class="input-group hidden">
+                    <label for="childDateOfDeath-${childIndex}">Tarikh Meninggal</label>
+                    <input type="date" id="childDateOfDeath-${childIndex}">
+                </div>
+                <div class="input-group">
+                    <label for="childBirthPlace-${childIndex}">Tempat Lahir</label>
+                    <input type="text" id="childBirthPlace-${childIndex}" placeholder="Bandar, Negeri">
+                </div>
+                <div class="input-group">
+                    <label for="childDeathPlace-${childIndex}">Tempat Meninggal <i>(jika ada)</i></label>
+                    <input type="text" id="childDeathPlace-${childIndex}" placeholder="Bandar, Negeri">
+                </div>
+                <div class="input-group">
+                    <label for="childOccupation-${childIndex}">Pekerjaan</label>
+                    <input type="text" id="childOccupation-${childIndex}" placeholder="Contoh: Pelajar, Doktor, Guru">
+                </div>
+                <div class="input-group">
+                    <label for="childEducation-${childIndex}">Pendidikan</label>
+                    <input type="text" id="childEducation-${childIndex}" placeholder="Contoh: SPM, Diploma, Ijazah">
+                </div>
+                <div class="input-group">
+                    <label for="childNotes-${childIndex}">Nota <i>(jika ada)</i></label>
+                    <textarea id="childNotes-${childIndex}" rows="2" placeholder="Maklumat tambahan..."></textarea>
+                </div>
+            `;
+            childrenContainer.appendChild(childEntryDiv);
+            childrenContainer.scrollTop = childrenContainer.scrollHeight;
+        };
+
+        bigFamilySelect.addEventListener('change', (e) => {
+            populateSmallFamily(e.target.value);
+        });
+
+        maritalStatusSelect.addEventListener('change', (e) => {
+            singleStatusFields.classList.add('hidden');
+            marriedStatusFields.classList.add('hidden');
+            childrenContainer.classList.add('hidden');
+            addChildBtn.classList.add('hidden');
+            childrenContainer.innerHTML = '';
+
+            if (e.target.value === 'Bujang') {
+                singleStatusFields.classList.remove('hidden');
+            } else if (e.target.value === 'Berkahwin') {
+                marriedStatusFields.classList.remove('hidden');
+                // Fix: Correctly check and uncheck the radio button
+                const hasChildrenRadio = document.querySelector('input[name="hasChildren"]:checked');
+                if (hasChildrenRadio) {
+                    hasChildrenRadio.checked = false;
+                }
+            }
+        });
+
+        hasChildrenRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'Ya') {
+                    childrenContainer.classList.remove('hidden');
+                    addChildBtn.classList.remove('hidden');
+                    // Add an initial child form if none exist
+                    if (childrenContainer.querySelectorAll('.child-entry').length === 0) {
+                         addChildForm();
+                    }
+                } else {
+                    childrenContainer.classList.add('hidden');
+                    addChildBtn.classList.add('hidden');
+                    childrenContainer.innerHTML = ''; // Clear existing child forms
+                }
+            });
+        });
+
+        addChildBtn.addEventListener('click', addChildForm);
+
+        // Event delegation for remove button and child status change
+        childrenContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-child-btn')) {
+                const childEntry = e.target.closest('.child-entry');
+                if (childEntry) {
+                    childEntry.remove();
+                }
+            }
+        });
+
+        childrenContainer.addEventListener('change', (e) => {
+            if (e.target.name.startsWith('childStatus-')) {
+                const childIndex = e.target.name.split('-')[1];
+                const dateOfDeathContainer = document.getElementById(`childDateOfDeathContainer-${childIndex}`);
+                if (e.target.value === 'Meninggal') {
+                    dateOfDeathContainer.classList.remove('hidden');
+                } else {
+                    dateOfDeathContainer.classList.add('hidden');
+                }
+            }
+        });
+
+        statusRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'Meninggal') {
+                    dateOfDeathContainer.classList.remove('hidden');
+                    document.getElementById('dateOfDeath').setAttribute('required', 'required');
+                } else {
+                    dateOfDeathContainer.classList.add('hidden');
+                    document.getElementById('dateOfDeath').removeAttribute('required');
+                }
+            });
+        });
+
+        // Local storage fallback functions
+        const saveToLocalStorage = (data) => {
+            try {
+                localStorage.setItem('familyTreeData', JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error("Error saving to localStorage:", e);
+                return false;
+            }
+        };
+
+        const loadFromLocalStorage = () => {
+            try {
+                const data = localStorage.getItem('familyTreeData');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error("Error loading from localStorage:", e);
+                return [];
+            }
+        };
+
+        const initializeFirebase = async () => {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is not provided.");
+                    initializeLocalMode();
+                    return;
+                }
+                
+                // Skip Firebase initialization entirely to avoid any Firestore errors
+                // Go directly to local storage mode
+                console.log("Skipping Firebase initialization. Using local storage mode.");
+                initializeLocalMode();
+
+            } catch (e) {
+                console.error("Error during initialization:", e);
+                console.log("Falling back to local storage mode");
+                initializeLocalMode();
+            }
+        };
+
+        const initializeLocalMode = () => {
+            console.log("Initializing local storage mode");
+            const localData = loadFromLocalStorage();
+            renderMembersWithFilters(localData);
+            
+            loadingScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            populateBigFamily();
+        };
+
+        const renderMembers = (members) => {
+            membersList.innerHTML = '';
+            if (members.length === 0) {
+                noMembersMessage.classList.remove('hidden');
+            } else {
+                noMembersMessage.classList.add('hidden');
+                members.forEach(member => {
+                    const memberCard = document.createElement('div');
+                    memberCard.className = 'member-card fade-in';
+                    const photoHtml = member.photo ? `<img src="${member.photo}" alt="${member.name}" class="member-photo">` : '';
+
+                    let childrenDetails = '';
+                    if (member.children && member.children.length > 0) {
+                        childrenDetails = `
+                            <div class="mt-4 pt-4 border-t border-gray-300">
+                                <h4 class="font-semibold text-gray-700 mb-3">👶 Anak-anak:</h4>
+                                ${member.children.map(child => `
+                                    <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                                        <p class="member-info"><strong>Nama Penuh:</strong> ${child.childFullName}</p>
+                                        <p class="member-info"><strong>Nama dalam Tulisan Cina:</strong> ${child.childChineseName || '-'}</p>
+                                        <p class="member-info"><strong>Nama Panggilan/Mesra:</strong> ${child.childNickname || '-'}</p>
+                                        <p class="member-info"><strong>Tarikh Lahir:</strong> ${child.childBirthday || '-'}</p>
+                                        <p class="member-info"><strong>Tempat Lahir:</strong> ${child.childBirthPlace || '-'}</p>
+                                        <p class="member-info"><strong>Jantina:</strong> ${child.childGender || '-'}</p>
+                                        <p class="member-info"><strong>Status Semasa:</strong> ${child.childStatus || '-'}</p>
+                                        ${child.childStatus === 'Meninggal' ? `<p class="member-info"><strong>Tarikh Meninggal:</strong> ${child.childDateOfDeath || '-'}</p>` : ''}
+                                        ${child.childStatus === 'Meninggal' ? `<p class="member-info"><strong>Tempat Meninggal:</strong> ${child.childDeathPlace || '-'}</p>` : ''}
+                                        <p class="member-info"><strong>Pekerjaan:</strong> ${child.childOccupation || '-'}</p>
+                                        <p class="member-info"><strong>Pendidikan:</strong> ${child.childEducation || '-'}</p>
+                                        ${child.childNotes ? `<p class="member-info"><strong>Nota:</strong> ${child.childNotes}</p>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                    
+                    const cardContent = {
+                        "Nama Penuh": member.name,
+                        "Nama dalam Tulisan Cina": member.chineseName,
+                        "Nama Panggilan/Mesra": member.nickname,
+                        "Jantina": member.gender,
+                        "Tarikh Lahir": member.birthday,
+                        "Tempat Lahir": member.birthPlace,
+                        "Status Semasa": member.status,
+                        "Tarikh Meninggal": member.dateOfDeath,
+                        "Tempat Meninggal": member.deathPlace,
+                        "Status Perkahwinan": member.maritalStatus,
+                        "Pekerjaan": member.occupation,
+                        "Pendidikan": member.education
+                    };
+
+                    if (member.maritalStatus === 'Bujang') {
+                        cardContent["Nama Bapa"] = member.fatherName;
+                        cardContent["Nama Ibu"] = member.motherName;
+                    } else if (member.maritalStatus === 'Berkahwin') {
+                        cardContent["Nama Suami/Isteri"] = member.spouseName;
+                        cardContent["Mempunyai Anak"] = member.hasChildren;
+                    }
+
+                    const cardHtml = Object.entries(cardContent).map(([key, value]) => {
+                        if (value) {
+                            return `<div class="member-info"><strong>${key}:</strong> ${value}</div>`;
+                        }
+                        return '';
+                    }).join('');
+
+                    memberCard.innerHTML = `
+                        ${photoHtml}
+                        ${cardHtml}
+                        ${childrenDetails}
+                        <button data-id="${member.id}" class="delete-btn absolute top-3 right-3 btn-danger">
+                            🗑️ Padam
+                        </button>
+                    `;
+                    membersList.appendChild(memberCard);
+                });
+                // Attach event listeners to all delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        memberIdToDelete = e.target.dataset.id;
+                        confirmModal.classList.remove('hidden');
+                    });
+                });
+            }
+        };
+
+        memberForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bigFamily = bigFamilySelect.value;
+            const smallFamily = smallFamilySelect.value;
+            const name = document.getElementById('name').value;
+            const chineseName = document.getElementById('chineseName').value;
+            const nickname = document.getElementById('nickname').value;
+            const maritalStatus = maritalStatusSelect.value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value || null;
+            const birthday = document.getElementById('birthday').value;
+            const status = document.querySelector('input[name="status"]:checked')?.value || null;
+            const dateOfDeath = status === 'Meninggal' ? document.getElementById('dateOfDeath').value : null;
+            const notes = document.getElementById('notes').value;
+            const photoInput = document.getElementById('photo');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Additional fields
+            const birthPlace = document.getElementById('birthPlace').value;
+            const deathPlace = document.getElementById('deathPlace').value;
+            const occupation = document.getElementById('occupation').value;
+            const education = document.getElementById('education').value;
+            
+            // Relationship fields
+            const parent1 = document.getElementById('parent1').value;
+            const parent2 = document.getElementById('parent2').value;
+            const spouse = document.getElementById('spouse').value;
+            const siblings = Array.from(document.getElementById('siblings').selectedOptions).map(option => option.value);
+
+            // Conditional fields
+            const fatherName = maritalStatus === 'Bujang' ? document.getElementById('fatherName').value : null;
+            const motherName = maritalStatus === 'Bujang' ? document.getElementById('motherName').value : null;
+            const spouseName = maritalStatus === 'Berkahwin' ? document.getElementById('spouseName').value : null;
+            const hasChildren = maritalStatus === 'Berkahwin' ? document.querySelector('input[name="hasChildren"]:checked')?.value || null : null;
+            
+            let children = [];
+            if (maritalStatus === 'Berkahwin' && hasChildren === 'Ya') {
+                const childEntries = childrenContainer.querySelectorAll('.child-entry');
+                childEntries.forEach((entry, index) => {
+                    const childData = {
+                        childFullName: entry.querySelector('input[id^="childFullName-"]')?.value || '',
+                        childChineseName: entry.querySelector('input[id^="childChineseName-"]')?.value || '',
+                        childNickname: entry.querySelector('input[id^="childNickname-"]')?.value || '',
+                        childBirthday: entry.querySelector('input[id^="childBirthday-"]')?.value || '',
+                        childGender: entry.querySelector(`input[name="childGender-${index}"]:checked`)?.value || '',
+                        childStatus: entry.querySelector(`input[name="childStatus-${index}"]:checked`)?.value || '',
+                        childBirthPlace: entry.querySelector(`input[id="childBirthPlace-${index}"]`)?.value || '',
+                        childDeathPlace: entry.querySelector(`input[id="childDeathPlace-${index}"]`)?.value || '',
+                        childOccupation: entry.querySelector(`input[id="childOccupation-${index}"]`)?.value || '',
+                        childEducation: entry.querySelector(`input[id="childEducation-${index}"]`)?.value || '',
+                        childNotes: entry.querySelector(`textarea[id="childNotes-${index}"]`)?.value || ''
+                    };
+                    if (childData.childStatus === 'Meninggal') {
+                        childData.childDateOfDeath = entry.querySelector(`input[id="childDateOfDeath-${index}"]`)?.value || '';
+                    }
+                    children.push(childData);
+                });
+            }
+
+            // Data validation
+            if (!bigFamily || !smallFamily || !name || !birthday || !status) {
+                 showMessage("Sila lengkapkan semua medan wajib.");
+                 return;
+            }
+            if (status === 'Meninggal' && !dateOfDeath) {
+                showMessage("Sila masukkan tarikh meninggal.");
+                return;
+            }
+            
+            // Date validation
+            if (dateOfDeath && new Date(dateOfDeath) < new Date(birthday)) {
+                showMessage("Tarikh meninggal tidak boleh sebelum tarikh lahir.");
+                return;
+            }
+            
+            // Relationship validation
+            if (parent1 && parent2 && parent1 === parent2) {
+                showMessage("Ibu dan Bapa tidak boleh sama.");
+                return;
+            }
+            
+            // Child validation
+            if (children.length > 0) {
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    if (!child.childFullName || !child.childBirthday) {
+                        showMessage(`Sila lengkapkan maklumat anak #${i + 1}.`);
+                        return;
+                    }
+                    if (child.childStatus === 'Meninggal' && !child.childDateOfDeath) {
+                        showMessage(`Sila masukkan tarikh meninggal untuk anak #${i + 1}.`);
+                        return;
+                    }
+                    if (child.childDateOfDeath && new Date(child.childDateOfDeath) < new Date(child.childBirthday)) {
+                        showMessage(`Tarikh meninggal anak #${i + 1} tidak boleh sebelum tarikh lahir.`);
+                        return;
+                    }
+                }
+            }
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Menambah...';
+
+            let photoDataUrl = null;
+            if (photoInput.files.length > 0) {
+                const file = photoInput.files[0];
+                if (file.size > 5 * 1024 * 1024) { // 5MB size limit
+                    showMessage("Saiz fail gambar mestilah kurang daripada 5MB.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Tambah Ahli Keluarga';
+                    return;
+                }
+                photoDataUrl = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => resolve(event.target.result);
+                    reader.onerror = () => resolve(null);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            try {
+                const docData = {
+                    bigFamily,
+                    smallFamily,
+                    name,
+                    chineseName,
+                    nickname,
+                    maritalStatus,
+                    gender,
+                    birthday,
+                    status,
+                    dateOfDeath,
+                    notes,
+                    photo: photoDataUrl,
+                    // Additional fields
+                    birthPlace,
+                    deathPlace,
+                    occupation,
+                    education,
+                    // Relationship fields
+                    parent1,
+                    parent2,
+                    spouse,
+                    siblings,
+                    createdAt: new Date().toISOString()
+                };
+
+                if (maritalStatus === 'Bujang') {
+                    docData.fatherName = fatherName;
+                    docData.motherName = motherName;
+                } else if (maritalStatus === 'Berkahwin') {
+                    docData.spouseName = spouseName;
+                    docData.hasChildren = hasChildren;
+                    if (hasChildren === 'Ya') {
+                        docData.children = children;
+                    }
+                }
+
+                // Always use local storage mode
+                const localData = loadFromLocalStorage();
+                docData.id = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localData.push(docData);
+                if (saveToLocalStorage(localData)) {
+                    renderMembersWithFilters(localData);
+                    console.log("Data saved to local storage");
+                } else {
+                    showMessage("Gagal menyimpan data tempatan. Sila cuba lagi.");
+                    return;
+                }
+                
+                memberForm.reset();
+                showMessage("Ahli keluarga berjaya ditambah!");
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showMessage("Gagal menambah ahli. Sila cuba lagi.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Tambah Ahli Keluarga';
+                childrenContainer.innerHTML = '';
+            }
+        });
+
+        // Relationship Management Functions
+        function populateRelationshipDropdowns() {
+            const localData = loadFromLocalStorage();
+            const parent1Select = document.getElementById('parent1');
+            const parent2Select = document.getElementById('parent2');
+            const spouseSelect = document.getElementById('spouse');
+            const siblingsSelect = document.getElementById('siblings');
+            
+            // Clear existing options (except first option)
+            [parent1Select, parent2Select, spouseSelect, siblingsSelect].forEach(select => {
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+            });
+            
+            // Populate with existing family members
+            localData.forEach(member => {
+                const optionText = `${member.name}${member.chineseName ? ` (${member.chineseName})` : ''}`;
+                const optionValue = member.id;
+                
+                // Add to parent dropdowns
+                const parent1Option = new Option(optionText, optionValue);
+                const parent2Option = new Option(optionText, optionValue);
+                parent1Select.add(parent1Option);
+                parent2Select.add(parent2Option.cloneNode(true));
+                
+                // Add to spouse dropdown
+                const spouseOption = new Option(optionText, optionValue);
+                spouseSelect.add(spouseOption);
+                
+                // Add to siblings dropdown
+                const siblingOption = new Option(optionText, optionValue);
+                siblingsSelect.add(siblingOption);
+            });
+        }
+        
+        function updateRelationshipDropdowns() {
+            // Call this whenever new members are added
+            populateRelationshipDropdowns();
+        }
+        
+        // Initialize relationship dropdowns when page loads
+        populateRelationshipDropdowns();
+        
+        // Search and Filter Functionality
+        let allMembers = []; // Store all members for filtering
+        let originalRenderMembers = renderMembers; // Store the original function
+        
+        function searchAndFilterMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const genderFilter = document.getElementById('filterGender').value;
+            const maritalStatusFilter = document.getElementById('filterMaritalStatus').value;
+            
+            let filteredMembers = allMembers.filter(member => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    member.name.toLowerCase().includes(searchTerm) ||
+                    (member.chineseName && member.chineseName.toLowerCase().includes(searchTerm)) ||
+                    (member.nickname && member.nickname.toLowerCase().includes(searchTerm)) ||
+                    (member.occupation && member.occupation.toLowerCase().includes(searchTerm)) ||
+                    (member.education && member.education.toLowerCase().includes(searchTerm)) ||
+                    (member.birthPlace && member.birthPlace.toLowerCase().includes(searchTerm));
+                
+                // Status filter
+                const matchesStatus = !statusFilter || member.status === statusFilter;
+                
+                // Gender filter
+                const matchesGender = !genderFilter || member.gender === genderFilter;
+                
+                // Marital status filter
+                const matchesMaritalStatus = !maritalStatusFilter || member.maritalStatus === maritalStatusFilter;
+                
+                return matchesSearch && matchesStatus && matchesGender && matchesMaritalStatus;
+            });
+            
+            // Render filtered members
+            originalRenderMembers(filteredMembers);
+        }
+        
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterGender').value = '';
+            document.getElementById('filterMaritalStatus').value = '';
+            originalRenderMembers(allMembers);
+        }
+        
+        // Create a new function that handles both filtering and relationship updates
+        function renderMembersWithFilters(data) {
+            allMembers = data;
+            searchAndFilterMembers();
+            updateRelationshipDropdowns();
+        }
+        
+        // Add event listeners for search and filter
+        document.getElementById('searchInput').addEventListener('input', searchAndFilterMembers);
+        document.getElementById('filterStatus').addEventListener('change', searchAndFilterMembers);
+        document.getElementById('filterGender').addEventListener('change', searchAndFilterMembers);
+        document.getElementById('filterMaritalStatus').addEventListener('change', searchAndFilterMembers);
+        document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                // Always use local storage mode
+                const data = loadFromLocalStorage();
+
+                const dataStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'salasilah_keluarga_data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showMessage("Data salasilah keluarga dimuat turun sebagai fail JSON.");
+            } catch (e) {
+                console.error("Error downloading data: ", e);
+                showMessage("Gagal memuat turun data.");
+            }
+        });
+
+        window.addEventListener('load', () => {
+            initializeFirebase();
+        });
+    </script>
+</body>
+</html>

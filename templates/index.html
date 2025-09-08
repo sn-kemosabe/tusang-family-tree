@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-primary" data-translate="welcome-title">
+                <i class="fas fa-tree"></i> Welcome to TU SANG Family Tree
+            </h1>
+            <p class="lead" data-translate="welcome-subtitle">Preserve your family history and connect generations</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 fade-in-up">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%); margin: 0 auto;">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title mb-3" data-translate="add-member-card-title">Add Family Member</h5>
+                        <p class="card-text mb-4" data-translate="add-member-card-text">Help us build our family tree by adding information about family members.</p>
+                        <a href="{{ url_for('family_form') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus"></i> <span data-translate="add-member-btn">Add Member</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100 fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, var(--info-color) 0%, #0891b2 100%); margin: 0 auto;">
+                                <i class="fas fa-sitemap"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title mb-3" data-translate="view-tree-card-title">View Family Tree</h5>
+                        <p class="card-text mb-4" data-translate="view-tree-card-text">Explore our family connections and see how we're all related.</p>
+                        <a href="{{ url_for('family_tree') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-eye"></i> <span data-translate="view-tree-btn">View Tree</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> <span data-translate="how-to-use-title">How to Use This Site</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-user text-primary"></i> <span data-translate="for-family-members">For Family Members:</span></h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> <span data-translate="family-member-tip-1">Click "Add Family Member" to enter information</span></li>
+                                <li><i class="fas fa-check text-success"></i> <span data-translate="family-member-tip-2">Fill in as much information as you know</span></li>
+                                <li><i class="fas fa-check text-success"></i> <span data-translate="family-member-tip-3">Don't worry about making mistakes - admins can fix them</span></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cog text-primary"></i> <span data-translate="for-administrators">For Administrators:</span></h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> <span data-translate="admin-tip-1">Login to manage and verify information</span></li>
+                                <li><i class="fas fa-check text-success"></i> <span data-translate="admin-tip-2">Create family relationships</span></li>
+                                <li><i class="fas fa-check text-success"></i> <span data-translate="admin-tip-3">Generate printable family trees</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
